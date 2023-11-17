@@ -73,6 +73,9 @@ const carSchema = new mongoose.Schema({
     carDesc: {
         type: String
     },
+    price: {
+        type: Number
+    }
 
 })
 Cars = mongoose.model('Car', carSchema);

@@ -2,6 +2,8 @@ const express = require('express');
 const userCRUD = require('../controllers/userController')
 const userEmail = require('../controllers/emailController')
 const router = express.Router()
+const {upload} = require('../middlewares/multer');
+const { isAuthenticatedUser } = require('../middlewares/auth');
 
 router.
     post('/signup', userCRUD.signUp)
@@ -10,9 +12,7 @@ router.
     .post('/login', userCRUD.signIn)
     .post('/validateOTP', userCRUD.validateOTP)
     .post('/resetPassword', userCRUD.resetPassword)
-    .post('/profile', userCRUD.profile)
-    .get('/getProfile', userCRUD.profile)
-    .patch('/updateProfile', userCRUD.profile)
+    .patch('/updateProfile/:id',isAuthenticatedUser,upload.single('profileImage'), userCRUD.profile)
     
 
 exports.router = router

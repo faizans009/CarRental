@@ -1,4 +1,5 @@
 const Car = require("../models/carModel");
+const ResponseHandler = require("../utils/responseHandler")
 const fs = require("fs");
 // create cars
 exports.createCar = async (req, res) => {
@@ -45,21 +46,12 @@ exports.createCar = async (req, res) => {
         fuelType: fuelType,
         carDesc: carDesc,
       });
-
-      return res
-        .status(200)
-        .json({ message: "Car created successfully", newCar });
+      return new ResponseHandler(res, 200,true,"Car created successfully",newCar )
     } catch (error) {
-      console.log(error);
-
-      return res
-        .status(500)
-        .json({ message: "something went wrong", error: error.message });
+      return new ResponseHandler(res, 500,false,"something went wrong")
     }
   } else {
-    return res
-      .status(403)
-      .json({ message: "Unauthorized. Only admin users can create cars." });
+    return new ResponseHandler(res, 403,false,"Unauthorized. Only admin users can create cars.")
   }
 };
 
@@ -68,14 +60,11 @@ exports.getCar = async (req, res) => {
   try {
     const cars = await Car.find();
     if (cars.length === 0) {
-      return res.status(404).json({ message: "No cars found" });
+      return new ResponseHandler(res, 404,false,"No cars found")
     }
-
-    return res.status(200).json({ cars: cars });
+    return new ResponseHandler(res, 200,true,"Car found",cars)
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "unable to get car", error: error.message });
+    return new ResponseHandler(res, 500,false,"unable to get car")
   }
 };
 
@@ -85,13 +74,11 @@ exports.getOneCar = async (req, res) => {
   try {
     const car = await Car.findById(id);
     if (!car) {
-      return res.status(404).json({ message: "Car not found" });
+      return new ResponseHandler(res, 404,false,"Car not found")
     }
-    return res.status(200).json({ message: "car found", car });
+    return new ResponseHandler(res, 200,true,"car found", car)
   } catch (error) {
-    return res
-      .status(200)
-      .json({ message: "car not found", error: error.message });
+    return new ResponseHandler(res, 500,false,"car not found")
   }
 };
 
@@ -111,7 +98,7 @@ exports.updateCar = async (req, res) => {
     const car = await Car.findById(id);
 
     if (!car) {
-      return res.status(404).json({ message: "Car not found" });
+      return new ResponseHandler(res, 404,false,"Car not found")
     }
 
     // Check if an old image exists and if a new image is uploaded
@@ -124,14 +111,11 @@ exports.updateCar = async (req, res) => {
     const updatedCar = await Car.findByIdAndUpdate(id, req.body, { new: true });
 
     if (!updatedCar) {
-      return res.status(404).json({ message: "Car not found" });
+      return new ResponseHandler(res, 404,false,"Car not found")
     }
-
-    return res.status(200).json({ car: updatedCar });
+    return new ResponseHandler(res, 200,true,"Car Updated",updatedCar)
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Unable to update car", error: error.message });
+    return new ResponseHandler(res, 500,false,"Unable to update car")
   }
 };
 
@@ -139,17 +123,10 @@ exports.updateCar = async (req, res) => {
 exports.deleteCar = async (req, res) => {
   const { id } = req.params;
   try {
-    // const car = await Car.findById(id)
-    // if (!car) {
-    //     return res.status(404).json({ message: 'Car not found' });
-    // }
-
-    // Delete the car from the database
+    
     await Car.findByIdAndRemove(id);
-    return res.status(200).json({ message: "Car deleted successfully" });
+    return new ResponseHandler(res, 200,true,"Car deleted successfully")
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Car not deleted", error: error.message });
+    return new ResponseHandler(res, 500,false,"Car not deleted")
   }
 };
