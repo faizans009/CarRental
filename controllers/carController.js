@@ -48,7 +48,7 @@ exports.createCar = async (req, res) => {
       });
       return new ResponseHandler(res, 200,true,"Car created successfully",newCar )
     } catch (error) {
-      return new ResponseHandler(res, 500,false,"something went wrong")
+      return new ResponseHandler(res, 500,false,error.message)
     }
   } else {
     return new ResponseHandler(res, 403,false,"Unauthorized. Only admin users can create cars.")
@@ -64,7 +64,7 @@ exports.getCar = async (req, res) => {
     }
     return new ResponseHandler(res, 200,true,"Car found",cars)
   } catch (error) {
-    return new ResponseHandler(res, 500,false,"unable to get car")
+    return new ResponseHandler(res, 500,false,error.message)
   }
 };
 
@@ -78,7 +78,7 @@ exports.getOneCar = async (req, res) => {
     }
     return new ResponseHandler(res, 200,true,"car found", car)
   } catch (error) {
-    return new ResponseHandler(res, 500,false,"car not found")
+    return new ResponseHandler(res, 500,false,error.message)
   }
 };
 
@@ -115,7 +115,7 @@ exports.updateCar = async (req, res) => {
     }
     return new ResponseHandler(res, 200,true,"Car Updated",updatedCar)
   } catch (error) {
-    return new ResponseHandler(res, 500,false,"Unable to update car")
+    return new ResponseHandler(res, 500,false,error.message)
   }
 };
 
@@ -127,6 +127,6 @@ exports.deleteCar = async (req, res) => {
     await Car.findByIdAndRemove(id);
     return new ResponseHandler(res, 200,true,"Car deleted successfully")
   } catch (error) {
-    return new ResponseHandler(res, 500,false,"Car not deleted")
+    return new ResponseHandler(res, 500,false,error.message)
   }
 };

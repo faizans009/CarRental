@@ -1,7 +1,7 @@
 const Review = require("../models/reviewModel");
 const Car = require("../models/carModel");
 const User = require("../models/user");
-
+const ResponseHandler = require("../utils/responseHandler")
 // create review
 exports.createReview = async (req, res) => {
   try {
@@ -29,15 +29,10 @@ exports.createReview = async (req, res) => {
        validateBeforeSave: false
    })
     // await car.save();
-
-    return res
-      .status(200)
-      .json({ message: "Review created successfully", newReview });
+    return new ResponseHandler(res, 200,true,"Review deleted successfully",newReview)
+   
   } catch (error) {
-    console.error("Error:", error);
-    return res
-      .status(500)
-      .json({ message: "something went wrong", error: error.message });
+    return new ResponseHandler(res, 500,false,error.message)
   }
 };
 
@@ -46,13 +41,12 @@ exports.getReview = async (req,res) => {
     try{
       const reviews = await Review.find()
       if (reviews.length === 0) {
-        return res.status(404).json({ message: "No reviews found" });
+        return new ResponseHandler(res, 400,false,"No reviews found")
     }
-
-    return res.status(200).json({reviews:reviews});
+    return new ResponseHandler(res, 200,true,"Reviews get successfully",reviews)
     
 }
 catch(error){
-    return res.status(500).json({message: "unable to get reviews",error: error.message})
+  return new ResponseHandler(res, 500,false,error.message)
 }
     }

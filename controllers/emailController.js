@@ -1,5 +1,5 @@
 
-// emailController.js
+const ResponseHandler = require("../utils/responseHandler")
 const nodemailer = require("nodemailer");
 const { generateOTP } = require("./OTPGenerate");
 const expressAsyncHandler = require("express-async-handler");
@@ -21,8 +21,8 @@ exports.sendEmail = expressAsyncHandler(async (req, res) => {
     const { email } = req.body;
     const user = await User.findOne({ email: email });
     if (!user) {
-        // return new ResponseHandler(res, 404,false,"User not found" )
-        return res.status(404).json({ message: "User not found" });
+        return new ResponseHandler(res, 404,false,"User not found" )
+        // return res.status(404).json({ message: "User not found" });
     }
 
     // Generate a new OTP as a number
@@ -46,11 +46,11 @@ console.log(otp);
 
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            // return new ResponseHandler(res, 500,false,"Failed to send email" )
-            return res.status(500).json({ message: "Failed to send email" });
+            return new ResponseHandler(res, 500,false,"Failed to send email" )
+            // return res.status(500).json({ message: "Failed to send email" });
         } else {
-            // return new ResponseHandler(res, 200,true,"Email sent successfully" )
-            return res.status(200).json({ message: "Email sent successfully" });
+            return new ResponseHandler(res, 200,true,"Email sent successfully" )
+            // return res.status(200).json({ message: "Email sent successfully" });
         }
     });
 });

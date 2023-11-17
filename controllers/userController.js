@@ -29,7 +29,7 @@ exports.signUp = async (req, res) => {
     return new ResponseHandler(res, 201,true,"New user created successfully",newUser )
    
   } catch (error) {
-    return new ResponseHandler(res, 500,false,"User already exists" )
+    return new ResponseHandler(res, 500,false,error.message )
   }
 };
 
@@ -44,7 +44,7 @@ exports.getUser = async(req,res) => {
         return new ResponseHandler(res, 200,true,"Get User Successfully",user )
     } 
     catch (error) {
-      return new ResponseHandler(res, 500,false,"Something went wrong" )
+      return new ResponseHandler(res, 500,false,error.message )
     }
   }else {
     return res
@@ -71,7 +71,7 @@ exports.signIn = async (req, res) => {
     const token = generateToken(res,existingUser);
     return new ResponseHandler(res, 201,true,"Sign in Successfully",{existingUser,token} )
   } catch (error) {
-    return new ResponseHandler(res, 500,false,"Something went wrong" )
+    return new ResponseHandler(res, 500,false,error.message )
   }
 };
 
@@ -86,7 +86,6 @@ exports.validateOTP = async (req, res) => {
     if (!user) {
       return new ResponseHandler(res, 404,false,"User not found" )
     }
-    
     const parsedEnteredOTP = parseInt(enteredOTP, 10);
     
     if (isNaN(parsedEnteredOTP)) {
@@ -94,19 +93,19 @@ exports.validateOTP = async (req, res) => {
     }
 
     if (user.otp.value !== parsedEnteredOTP) {
-      
-      
-      
       return new ResponseHandler(res, 400,false,"Invalid OTP" )
     }
- 
+    if ( Date.now() > user.otp.expiresAt){
+      return new ResponseHandler(res, 400,false,"OTP expired" )
+    }
+    
     await user.save();
 
     
     const token = generateToken(res, user);
     return new ResponseHandler(res, 200,true,"OTP is valid", { token } )
   } catch (error) {
-    return new ResponseHandler(res, 500,false,"Something went wrong" )
+    return new ResponseHandler(res, 500,false,error.message )
   
   }
 };
@@ -130,7 +129,7 @@ exports.resetPassword = async (req, res) => {
     await user.save();
     return new ResponseHandler(res, 200,true,"Password reset successful" )
   } catch (error) {
-    return new ResponseHandler(res, 500,false,"Something went wrong" )
+    return new ResponseHandler(res, 500,false,error.message )
   }
 };
 
@@ -156,6 +155,6 @@ exports.profile = async (req, res) => {
     }
     return new ResponseHandler(res, 200,true,"Profile updated" ,updatedProfile )
   } catch (error) {
-    return new ResponseHandler(res, 500,false,"Something went wrong" )
+    return new ResponseHandler(res, 500,false,error.message )
   }
 };

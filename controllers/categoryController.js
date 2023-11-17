@@ -1,5 +1,6 @@
 const Category = require("../models/categoryModel");
 const fs = require("fs");
+const ResponseHandler = require("../utils/responseHandler")
 
 // create category
 exports.createCategory = async (req, res) => {
@@ -11,7 +12,7 @@ exports.createCategory = async (req, res) => {
         categoryName: categoryName,
       });
       if (existingCategory) {
-        return res.status(400).json({ message: "Category already exists" });
+        return new ResponseHandler(res, 400,false,"Category already exists" )
       }
       const categoryImages = req.file.path;
 
@@ -19,18 +20,12 @@ exports.createCategory = async (req, res) => {
         categoryImage: categoryImages,
         categoryName: categoryName,
       });
-      return res
-        .status(500)
-        .json({ message: "Category created successfully", newCategory });
+      return new ResponseHandler(res, 200,true,"Category created successfully",newCategory )
     } catch (error) {
-      return res
-        .status(500)
-        .json({ message: "something went wrong", error: error.message });
+      return new ResponseHandler(res, 500,false,error.message )
     }
   } else {
-    return res
-      .status(403)
-      .json({ message: "Unauthorized. Only admin users can create cars." });
+    return new ResponseHandler(res, 403,true,"Unauthorized. Only admin users can create cars" )
   } 
 };
 
@@ -40,14 +35,13 @@ exports.getCategory = async(req,res) => {
 
       const category = await Category.find();
       if (category.length === 0) {
-          return res.status(404).json({ message: "No categories found" });
+        return new ResponseHandler(res, 404,false,"No categories found" )
       }
-
-      return res.status(200).json({category:category});
+      return new ResponseHandler(res, 200,true,"Car created successfully",category )
       
   }
   catch(error){
-      return res.status(500).json({message: "unable to get category",error: error.message})
+    return new ResponseHandler(res, 500,false,error.message )
   }
 }
 
@@ -57,13 +51,12 @@ exports.getOneCategory = async(req,res) =>{
   try{
       const category = await Category.findById(id)
       if (!category) {
-          return res.status(404).json({ message: "category not found" });
+        return new ResponseHandler(res, 404,false,"Category not found" )
       }
-      return res.status(200).json({message: "category found", category})
+      return new ResponseHandler(res, 200,true,"Category found",category )
   }
   catch(error){
-      
-      return res.status(200).json({message: "category not found", error: error.message})
+    return new ResponseHandler(res, 200,true,error.message )
   }
 }
 
@@ -83,7 +76,7 @@ exports.updateCategory = async (req, res) => {
       const category = await Category.findById(id);
 
       if (!category) {
-          return res.status(404).json({ message: "Category not found" });
+        return new ResponseHandler(res, 404,false,"Category not found" )
       }
 
       // Check if an old image exists and if a new image is uploaded
@@ -92,16 +85,15 @@ exports.updateCategory = async (req, res) => {
           fs.unlinkSync(category.categoryImage); 
       }
 
-      // Update the category data and return the updated category
       const updatedCategory = await Category.findByIdAndUpdate(id, req.body, { new: true });
 
       if (!updatedCategory) {
-          return res.status(404).json({ message: "Category not found" });
+        return new ResponseHandler(res, 404,false,"Category not found" )
       }
 
-      return res.status(200).json({ category: updatedCategory });
+      return new ResponseHandler(res, 200,true,"Category updated successfully",updatedCategory )
   } catch (error) {
-      return res.status(500).json({ message: 'Unable to update car', error: error.message });
+    return new ResponseHandler(res, 500,false,error.message )
   }
 };
 
@@ -109,17 +101,11 @@ exports.updateCategory = async (req, res) => {
 exports.deleteCategory = async(req,res) => {
   const {id} = req.params
   try{
-      // const category = await Category.findById(id)
-      // if (!category) {
-      //     return res.status(404).json({ message: 'Category not found' });
-      // }
-
-      // Delete the car from the database
+      
       await Category.findByIdAndRemove(id);
-      return res.status(200).json({ message: 'Category deleted successfully'})
+      return new ResponseHandler(res, 200,true,"Category deleted successfully" )
   }
   catch(error){
-      
-      return res.status(500).json({ message: 'Category not deleted', error: error.message})
+    return new ResponseHandler(res, 500,true,error.message )
   }
 }

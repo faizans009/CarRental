@@ -1,6 +1,8 @@
 const Order = require("../models/orderModel");
 const Car = require("../models/carModel");
 const User = require("../models/user");
+const ResponseHandler = require("../utils/responseHandler") 
+
 exports.createOrder = async (req, res) => {
   try {
     const {
@@ -25,12 +27,12 @@ exports.createOrder = async (req, res) => {
     const car = await Car.findOne({ _id: carId });
 
     if (!user && !car) {
-      return res.status(404).json({ message: "User and Car not found" });
+      return new ResponseHandler(res, 404,false,"User and Car not found" )
     }
     const existingOrder = await Order.findOne({ user: userId, car: carId , status: { $in: ['accepted', 'rented'] }});
 
     if (existingOrder) {
-      return res.status(400).json({ error: "Car is already rented by u" });
+      return new ResponseHandler(res, 400,false,{ error: "Car is already rented by u" } )
     }
 
     const pickupDateTime = new Date(
@@ -74,11 +76,9 @@ exports.createOrder = async (req, res) => {
       totalDays: totalDays,
       totalPrice:totalPrice
     });
-    return res.status(200).json({ message: "Success", newOrderInfo });
+    return new ResponseHandler(res, 200,true,"Car rented successfully",newOrderInfo )
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    return new ResponseHandler(res, 500,false,error.message )
   }
 };
 
@@ -86,20 +86,17 @@ exports.createOrder = async (req, res) => {
 exports.getOrder = async (req, res) => {
   const isAdmin = req.user._id && req.user.admin;
   if (!isAdmin) {
-    return res.status(403).json({
-      message: "Unauthorized: Only admin can access Order information.",
-    });
+    return new ResponseHandler(res, 403,false,"Unauthorized: Only admin can access Order information" )
+    
   }
   try {
     const newOrderInfo = await Order.find();
     if (newOrderInfo.length === 0) {
-      return res.status(404).json({ message: "No Order info found" });
+      return new ResponseHandler(res, 404,false,"No Order info found" )
     }
-    return res.status(200).json({ message: "Success", newOrderInfo });
+    return new ResponseHandler(res, 200,true,"Get order successfully",newOrderInfo )
   } catch (error) {
-    return res
-      .status(500)
-      .json({ message: "Something went wrong", error: error.message });
+    return new ResponseHandler(res, 500,false,error.message )
   }
 };
 
@@ -108,14 +105,12 @@ exports.updateStatus = async (req,res) => {
         const {orderId, status} = req.body;
         const order = await Order.findByIdAndUpdate(orderId, {status}) 
         if (!order){
-            return res.status(404).json({message: "Order not found"})
+          return new ResponseHandler(res, 404,false,"Order not found" )
         }
-        return res.status(200).json({
-            success:true,
-            message: "status Updated"
-        })
+        return new ResponseHandler(res, 200,true,"status Updated" )
+        
     }
     catch(error){
-        return res.status(500).json({success:false,message: "Something went wrong",error: error.message })
+      return new ResponseHandler(res, 500,false,error.message )
     }
 }

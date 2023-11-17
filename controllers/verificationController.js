@@ -1,4 +1,5 @@
 const Verification = require('../models/verificationModel')
+const ResponseHandler = require("../utils/responseHandler")
 const fs = require('fs')
 // create verification
 exports.createVerification = async (req,res) => {
@@ -13,30 +14,23 @@ exports.createVerification = async (req,res) => {
         frontImage: frontImage,
         backImage: backImage,
       });
-      return res.status(200).json({
-        message: 'Category created successfully',
-        newCategory: newVerification,
-      });
+      return new ResponseHandler(res, 200,true,'Category created successfully', newVerification)
+     
     } catch (error) {
-      return res.status(500).json({
-        message: 'Something went wrong',
-        error: error.message,
-      });
+      return new ResponseHandler(res, 500,false,error.message )
+      
     }
 }
-// get all verification
+
 exports.getVerification = async (req, res) => {
     try {
       const verification = await Verification.find();
       if (verification.length === 0) {
-        return res.status(404).json({ message: "No license verification found" });
+        return new ResponseHandler(res, 404,false,"No license verification found" )
       }
-  
-      return res.status(200).json({ verification: verification });
+      return new ResponseHandler(res, 200,true,"Get verification",verification )
     } catch (error) {
-      return res
-        .status(500)
-        .json({ message: "unable to get license verification", error: error.message });
+      return new ResponseHandler(res, 500,false,error.message )
     }
   };
 
@@ -46,10 +40,9 @@ exports.getVerification = async (req, res) => {
     const updateData = req.body;
     
   
-    // Check if new image files are uploaded and update the image paths in updateData
     if (req.files) {
-      updateData.frontImage = req.files.frontImage[0].path; // Assuming the field name is 'frontImage'
-      updateData.backImage = req.files.backImage[0].path; // Assuming the field name is 'backImage'
+      updateData.frontImage = req.files.frontImage[0].path; 
+      updateData.backImage = req.files.backImage[0].path; 
     }
   
     try {
@@ -57,7 +50,7 @@ exports.getVerification = async (req, res) => {
       const verification = await Verification.findById(id);
   
       if (!verification) {
-        return res.status(404).json({ message: 'Verification not found' });
+        return new ResponseHandler(res, 404,false,"Verification not found" )
       }
   
       // Check if old images exist and if new images are uploaded
@@ -71,12 +64,11 @@ exports.getVerification = async (req, res) => {
       const updatedVerification = await Verification.findByIdAndUpdate(id, updateData, { new: true });
   
       if (!updatedVerification) {
-        return res.status(404).json({ message: 'Verification not found' });
+        return new ResponseHandler(res, 404,false,"Verification not found" )
       }
-  
-      return res.status(200).json({ verification: updatedVerification });
+      return new ResponseHandler(res, 200,true,"Verification updated",updatedVerification )
     } catch (error) {
-      return res.status(500).json({ message: 'Unable to update verification', error: error.message });
+      return new ResponseHandler(res, 500,false, )
     }
   };
 
@@ -85,10 +77,8 @@ exports.deleteVerification = async(req,res) => {
     const {id} = req.params
     try{
     await Verification.findByIdAndRemove(id)
-    return res.status(200).json({ message: "license verification deleted successfully" });
+    return new ResponseHandler(res, 200,true,"license verification deleted successfully" )
 } catch (error) {
-  return res
-    .status(500)
-    .json({ message: "license verification not deleted", error: error.message });
+  return new ResponseHandler(res, 500,false,error.message)
 }
 }
