@@ -1,25 +1,17 @@
-const User = require("../models/user");
-const bcrypt = require("bcrypt");
-// const jwt = require("jsonwebtoken");
+const userService = require('../services/userService')
 const generateToken = require("../middlewares/jwt");
 const ResponseHandler = require("../utils/responseHandler")
+const bcrypt = require("bcrypt");
 
 exports.signUp = async (req, res) => {
   const { username, email, password, mobile,admin } = req.body;
   try {
-   
-    const existingUser = await User.findOne({ email: email });
-    if (existingUser) {
-      return new ResponseHandler(res, 400,false,"User already exists" )
-    } 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await User.create({
-      username: username,
-      email: email,
-      password: hashedPassword,
-      mobile: mobile,
-      admin: admin
+    const newUser = await userService.signUp({
+      username,
+      email,
+      password,
+      mobile,
+      admin
     });
 
     const token = generateToken(res,newUser);
@@ -37,10 +29,8 @@ exports.getUser = async(req,res) => {
   if (req.user._id && req.user.admin){
     try{
         const {id} = req.body;
-        const user = await User.findById(id);
-        if (!user){
-          return new ResponseHandler(res, 404,false,"User not found" )
-        }
+        const user = await userService.getUser(id);
+       
         return new ResponseHandler(res, 200,true,"Get User Successfully",user )
     } 
     catch (error) {
@@ -53,57 +43,24 @@ exports.getUser = async(req,res) => {
   }
 };
 
+
 exports.signIn = async (req, res) => {
-  const { email, password } = req.body;
+  
   try {
     
-    const existingUser = await User.findOne({ email: email });
-    if (!existingUser) {
-      return new ResponseHandler(res,404,false,"User not found" )
-    }
+    const { email, password } = req.body;
+    const { user, token } = await userService.signIn(res, email, password )
 
-    const matchPassword = await bcrypt.compare(password, existingUser.password);
-    if (!matchPassword) {
-      return new ResponseHandler(res, 400,false,"Invalid Credentials" )
-    }
-
-  
-    const token = generateToken(res,existingUser);
-    return new ResponseHandler(res, 201,true,"Sign in Successfully",{existingUser,token} )
+    return new ResponseHandler(res, 201, true, "Sign in Successfully", { user, token });
   } catch (error) {
-    return new ResponseHandler(res, 500,false,error.message )
+    return new ResponseHandler(res, 500, false, error.message || "Internal server error");
   }
 };
-
 exports.validateOTP = async (req, res) => {
   const { email, enteredOTP } = req.body;
-
   try {
-    
-    
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return new ResponseHandler(res, 404,false,"User not found" )
-    }
-    const parsedEnteredOTP = parseInt(enteredOTP, 10);
-    
-    if (isNaN(parsedEnteredOTP)) {
-      return new ResponseHandler(res, 400,false,"Invalid OTP format" )
-    }
-
-    if (user.otp.value !== parsedEnteredOTP) {
-      return new ResponseHandler(res, 400,false,"Invalid OTP" )
-    }
-    if ( Date.now() > user.otp.expiresAt){
-      return new ResponseHandler(res, 400,false,"OTP expired" )
-    }
-    
-    await user.save();
-
-    
-    const token = generateToken(res, user);
-    return new ResponseHandler(res, 200,true,"OTP is valid", { token } )
+    const validate = await userService.validateOTP({ res,email,enteredOTP });
+    return new ResponseHandler(res, validate.status, validate.success, validate.message, validate.data)
   } catch (error) {
     return new ResponseHandler(res, 500,false,error.message )
   
@@ -114,20 +71,9 @@ exports.resetPassword = async (req, res) => {
   const { email, newPassword, confirmPassword } = req.body;
 
   try {
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return new ResponseHandler(res, 404,false,"User not found" )
-    }
-    if (newPassword !== confirmPassword) {
-      return new ResponseHandler(res, 400,false,"Password and confirm password do not match" )
-    }
-
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
-
-    await user.save();
-    return new ResponseHandler(res, 200,true,"Password reset successful" )
+    const user = await userService.resetPassword({ email, newPassword, confirmPassword });
+    
+    return new ResponseHandler(res, user.status, user.success, user.message)
   } catch (error) {
     return new ResponseHandler(res, 500,false,error.message )
   }
@@ -142,17 +88,8 @@ exports.profile = async (req, res) => {
       updateData.profileImage = req.file.path;
     }
 
-    const existingUser = await User.findOne({ _id: id });
-
-    if (!existingUser) {
-      return new ResponseHandler(res, 404,false,"User not found" )
-    }
-
-    const updatedProfile = await User.findByIdAndUpdate(id, updateData, { new: true });
-
-    if (!updatedProfile) {
-      return new ResponseHandler(res, 404,false,"User not found" )
-    }
+    const updatedProfile = await userService.profile({ req,id,updateData });
+   
     return new ResponseHandler(res, 200,true,"Profile updated" ,updatedProfile )
   } catch (error) {
     return new ResponseHandler(res, 500,false,error.message )

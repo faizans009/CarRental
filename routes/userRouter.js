@@ -7,7 +7,7 @@ const { isAuthenticatedUser } = require('../middlewares/auth');
 
 router.
     post('/signup', userCRUD.signUp)
-    .get('/getUser', userCRUD.getUser)
+    .get('/getUser',isAuthenticatedUser, userCRUD.getUser)
     .post('/email', userEmail.sendEmail)
     .post('/login', userCRUD.signIn)
     .post('/validateOTP', userCRUD.validateOTP)

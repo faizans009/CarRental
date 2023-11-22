@@ -1,55 +1,64 @@
-const Category = require("../models/categoryModel");
+const categoryService = require('../services/categoryService');
 const fs = require("fs");
 const ResponseHandler = require("../utils/responseHandler")
 
 // create category
 exports.createCategory = async (req, res) => {
-  const { categoryName } = req.body;
+  const { companyName } = req.body;
 
   if (req.user._id && req.user.admin) {
     try {
-      const existingCategory = await User.findOne({
-        categoryName: categoryName,
-      });
-      if (existingCategory) {
-        return new ResponseHandler(res, 400,false,"Category already exists" )
-      }
+      
       const categoryImages = req.file.path;
 
-      const newCategory = await Category.create({
+      const newCategory = await categoryService.createCategory({
         categoryImage: categoryImages,
-        categoryName: categoryName,
+        companyName: companyName,
       });
       return new ResponseHandler(res, 200,true,"Category created successfully",newCategory )
     } catch (error) {
+      
       return new ResponseHandler(res, 500,false,error.message )
     }
   } else {
-    return new ResponseHandler(res, 403,true,"Unauthorized. Only admin users can create cars" )
+    return new ResponseHandler(res, 403,true,"Unauthorized. Only admin can create category" )
   } 
 };
 
 // get all category
 exports.getCategory = async(req,res) => {
   try{
-
-      const category = await Category.find();
-      if (category.length === 0) {
-        return new ResponseHandler(res, 404,false,"No categories found" )
-      }
+    const category = await categoryService.getCategory()
+    if (category.length === 0) {
+      return new ResponseHandler(res, 404,false,"No categories found" )
+    }
       return new ResponseHandler(res, 200,true,"Car created successfully",category )
       
-  }
+  } 
   catch(error){
     return new ResponseHandler(res, 500,false,error.message )
-  }
+  } 
 }
 
+exports.getCarByCategory = async(req,res) => {
+  try{
+     const {companyName} = req.body;
+     const cars = await categoryService.getCarsByCategory(companyName);
+     if (cars.length === 0) {
+      return new ResponseHandler(res, 404,false,"No car found with that company" )
+    }
+     return new ResponseHandler(res, 200,true,"get Cars with company name",cars )
+  }
+  catch(error){
+    return new ResponseHandler(res, 200,true,error.message )
+  }
+} 
+ 
 // get one category
 exports.getOneCategory = async(req,res) =>{
   const {id} = req.params
   try{
-      const category = await Category.findById(id)
+      const category = await categoryService.getOneCategory(id)
       if (!category) {
         return new ResponseHandler(res, 404,false,"Category not found" )
       }
@@ -59,19 +68,18 @@ exports.getOneCategory = async(req,res) =>{
     return new ResponseHandler(res, 200,true,error.message )
   }
 }
-
 // update category
-
 exports.updateCategory = async (req, res) => {
-  const { id } = req.params;
+  
+  if (req.user._id && req.user.admin) {
+  try {
+    const { id } = req.params;
   const updateData = req.body;
 
   // Check if a new image file is uploaded and update the image path in updateData
   if (req.file) {
       updateData.categoryImage = req.file.path;
   }
-
-  try {
       // Find the category by its ID
       const category = await Category.findById(id);
 
@@ -95,17 +103,25 @@ exports.updateCategory = async (req, res) => {
   } catch (error) {
     return new ResponseHandler(res, 500,false,error.message )
   }
+} else {
+  return new ResponseHandler(res, 403,true,"Unauthorized. Only admin can update  category" )
+} 
 };
 
 // delete category
 exports.deleteCategory = async(req,res) => {
-  const {id} = req.params
+  if (req.user._id && req.user.admin) {
   try{
-      
-      await Category.findByIdAndRemove(id);
+    const {id} = req.params
+      await categoryService.deleteCategory(id);
       return new ResponseHandler(res, 200,true,"Category deleted successfully" )
   }
   catch(error){
     return new ResponseHandler(res, 500,true,error.message )
   }
+} else {
+  return new ResponseHandler(res, 403,true,"Unauthorized. Only admin can delete category" )
+} 
 }
+
+

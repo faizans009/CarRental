@@ -4,7 +4,7 @@ const categorySchema = new mongoose.Schema({
     categoryImage : {
         type: String
     },
-    categoryName : {
+    companyName : {
         type: String
     }
 })
