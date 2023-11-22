@@ -32,7 +32,6 @@ async function updateVerification(id,updateData,files){
             throw new Error('License Verification not found')
         }
         if (files && verification.frontImage && verification.backImage) {
-            // Delete the old images
             await fs.unlinkSync(verification.frontImage);
             await fs.unlinkSync(verification.backImage);
           }

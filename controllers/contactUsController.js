@@ -3,7 +3,6 @@ const ResponseHandler = require("../utils/responseHandler")
 
 exports.createContactUs = async (req, res) => {
     const { firstName, lastName, email, phone, message } = req.body;
-    console.log('Request Body:', req.body);
     try {
         const newContact = await contactService.createContact({
             firstName: firstName,

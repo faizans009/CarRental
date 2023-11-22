@@ -10,8 +10,6 @@ const reviewRouter = require('./routes/reviewRouter');
 const verificationRouter = require('./routes/verificationRouter');
 const contactUsRouter = require('./routes/contactUsRouter');
 const favouriteRouter = require('./routes/favouriteRouter');
-// const billingRouter = require('./routes/billingRouter');
-// const rentalRouter = require('./routes/rentalInfoRouter');
 const orderRouter = require('./routes/orderRouter');
 
 const cookieParser = require('cookie-parser');
@@ -36,8 +34,6 @@ app.use('/review', reviewRouter.router);
 app.use('/verification', verificationRouter.router);
 app.use('/contact', contactUsRouter.router);
 app.use('/fav',  favouriteRouter.router )
-// app.use('/billing',  billingRouter.router )
-// app.use('/rent',  rentalRouter.router )
 app.use('/order',  orderRouter.router )
 
 

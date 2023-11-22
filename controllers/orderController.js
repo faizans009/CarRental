@@ -31,9 +31,9 @@ exports.getOrder = async (req, res) => {
 exports.updateStatus = async (req,res) => {
     try{
         const {orderId, status} = req.body;
-        const order = await orderService.updateStatus(orderId, {status}) 
+        const newOrder = await orderService.updateStatus(orderId, {status}) 
         
-        return new ResponseHandler(res, 200,true,"status Updated",order )
+        return new ResponseHandler(res, 200,true,"status Updated",newOrder )
         
     }
     catch(error){

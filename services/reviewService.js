@@ -5,8 +5,11 @@ async function createReview(userId, review, rating, carId) {
     const user = await User.findOne({_id: userId})
     const car = await Car.findOne({ _id: carId });
 
-    if (!user && !car) {
-        return res.status(404).json({ message: "Car not found" });
+    if (!user) {
+        throw new Error("User not found" );
+      }
+    if (!car) {
+      throw new Error("Car not found" );
       }
 
       const newReview = await Review.create({

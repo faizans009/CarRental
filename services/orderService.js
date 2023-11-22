@@ -39,9 +39,6 @@ async function createOrder({
           const timeDifference = Math.abs(dropOffDateTime.getTime() - pickupDateTime.getTime());
           const totalDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
           const totalPrice = totalDays * car.price;
-          console.log(totalPrice);
-          
-          console.log(typeof totalPrice);
           
 
           const newOrderInfo = await Order.create({
