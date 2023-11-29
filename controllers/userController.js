@@ -10,8 +10,7 @@ exports.signUp = async (req, res) => {
       username,
       email,
       password,
-      mobile,
-      admin
+      mobile
     });
 
     const token = generateToken(res,newUser);

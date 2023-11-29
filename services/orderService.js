@@ -31,7 +31,7 @@ async function createOrder({
         }
         const existingOrder = await Order.findOne({ user: userId, car: carId, status: { $in: ['accepted', 'rented'] }});
         if (existingOrder) {
-            throw new Error("Car is already rented by you");
+            throw new Error("Car is already rented");
           }
           const pickupDateTime = new Date(`${pickupDate} ${pickupTime}`);
           const dropOffDateTime = new Date(`${dropOffDate} ${dropOffTime}`);

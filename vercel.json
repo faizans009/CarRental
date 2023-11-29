@@ -1,4 +1,5 @@
 {  
+    "rewrites": [{ "source": "/uploads/profileImage/:path*", "destination": "/uploads/profileImage/:path*" }],
       "builds": [
         {
             "src": "./index.js",
