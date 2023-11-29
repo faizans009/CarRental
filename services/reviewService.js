@@ -4,6 +4,7 @@ const User = require("../models/user");
 async function createReview(userId, review, rating, carId) {
     const user = await User.findOne({_id: userId})
     const car = await Car.findOne({ _id: carId });
+    const reviews = await Review.find({ car: carId });
 
     if (!user) {
         throw new Error("User not found" );
@@ -18,14 +19,11 @@ async function createReview(userId, review, rating, carId) {
         rating: rating,
         review: review,
       });
-      car.reviews.push(newReview);
 
-      let avg = 0;
-    car.reviews.forEach((rev) => {
-       avg += rev.rating;
-   })
-   car.rating = avg / car.reviews.length;
-
+if (reviews.length > 0) {
+  avgRating = reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
+}
+car.rating = avgRating;
    await car.save({
     validateBeforeSave: false
 })

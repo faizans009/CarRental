@@ -4,7 +4,7 @@ exports.isAuthenticatedUser = async(req, res, next)=>{
     try {
         const token =  req.cookies.token;
         if(!token){
-            return next(new ErrorHandler("Please login to access this resource", 401));
+            return res.status(401).json({success:false,message:"Please login to access this resource"});
         }
         const decodedData = jwt.verify(token, process.env.SECRET_KEY);
         req.user = await User.findById(decodedData.id);

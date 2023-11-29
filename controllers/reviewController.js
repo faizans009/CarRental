@@ -7,7 +7,7 @@ exports.createReview = async (req, res) => {
     
     const newReview = await reviewService.createReview(userId, review, rating, carId)
     
-    return new ResponseHandler(res, 200,true,"Review deleted successfully",newReview)
+    return new ResponseHandler(res, 200,true,"Review created successfully",newReview)
    
   } catch (error) {
     return new ResponseHandler(res, 500,false,error.message)

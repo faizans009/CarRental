@@ -39,31 +39,6 @@ const carSchema = new mongoose.Schema({
         type: Number,
         default:0
     },
-    reviews: [{ 
-        user: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            required: true
-        },
-        car: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Car',
-            required: true
-        },
-        
-        review: {
-            type: String,
-            required: true
-        },
-        rating: {
-            type: Number,
-            required: true
-        },
-        date: {
-            type: Date,
-            default: Date.now,
-          },
-     }],
     condition: {
         type: String
     },
