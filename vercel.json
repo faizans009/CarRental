@@ -1,14 +1,19 @@
-{  
-        "builds": [
-        {
-            "src": "./index.js",
-            "use":"@vercel/node"
-        }
+{
+    "builds": [
+      {
+        "src": "./index.js",
+        "use": "@vercel/node"
+      }
     ],
-    "routes":[
-        {
-            "src": "/(.*)",
-            "dest":"/" 
-        }
+    "routes": [
+      {
+        "src": "/uploads/profileImage/(.*)",
+        "dest": "/uploads/profileImage/$1"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/"
+      }
     ]
-}
+  }
+  
