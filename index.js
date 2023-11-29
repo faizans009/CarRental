@@ -37,7 +37,7 @@ app.use("/verification", verificationRouter.router);
 app.use("/contact", contactUsRouter.router); 
 app.use("/fav", favouriteRouter.router);
 app.use("/order", orderRouter.router);
-app.get('/test',(req,res)=>{
+app.get('/',(req,res)=>{
   res.send('test')
 })
 app.listen(process.env.PORT, () =>
