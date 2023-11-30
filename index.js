@@ -16,7 +16,7 @@ const cookieParser = require("cookie-parser");
 
 app.use(cors());
 app.use(express.json());
-app.use("/uploads", express.static("uploads/profileImage"));
+app.use("/uploads", express.static("uploads"));
 app.use(cookieParser());
 // Database
 dbConnection().catch((err) => console.log(err));
