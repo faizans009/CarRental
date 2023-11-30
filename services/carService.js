@@ -17,6 +17,7 @@ async function createCar({
     condition,
     fuelType,
     carDesc,
+    price,
     images,
   }) {
     try {
@@ -38,6 +39,7 @@ async function createCar({
         condition,
         fuelType,
         carDesc,
+        price
       });
   
       return newCar;
@@ -49,7 +51,7 @@ async function createCar({
 //   get all
 async function getAllCars(){
     try{
-        const cars = await Car.find();
+        const cars = await Car.find({ status: { $in: ['available'] }});
         return cars;
     }
     catch(error){

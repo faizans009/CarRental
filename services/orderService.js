@@ -29,9 +29,9 @@ async function createOrder({
         if (!user && !car){
             throw new Error("User and Car not found")
         }
-        const existingOrder = await Order.findOne({ user: userId, car: carId, status: { $in: ['accepted', 'rented'] }});
+        const existingOrder = await Car.findOne({ status: { $in: ['booked', 'rented'] }});
         if (existingOrder) {
-            throw new Error("Car is already rented");
+            throw new Error("Car is already booked");
           }
           const pickupDateTime = new Date(`${pickupDate} ${pickupTime}`);
           const dropOffDateTime = new Date(`${dropOffDate} ${dropOffTime}`);
@@ -39,6 +39,7 @@ async function createOrder({
           const timeDifference = Math.abs(dropOffDateTime.getTime() - pickupDateTime.getTime());
           const totalDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
           const totalPrice = totalDays * car.price;
+          
           
 
           const newOrderInfo = await Order.create({
@@ -66,7 +67,12 @@ async function createOrder({
             totalDays: totalDays,
             totalPrice: totalPrice,
           });
-          return newOrderInfo
+          await Car.updateOne(
+            { _id: carId },
+            { $set: { status: 'booked' } }
+        );
+
+        return newOrderInfo;
       
     }
     catch(error){
@@ -88,20 +94,18 @@ async function getOrder(){
   }
 }
 // update status
-async function updateStatus(orderId, {status}){
+async function updateStatus(carId, {status}){
   try{
-    const order = await Order.findByIdAndUpdate(orderId, {status}) 
-    if (!order) {
-      throw new Error("Order not found");
+    const car = await Car.findByIdAndUpdate(carId, {status}) 
+    if (!car) {
+      throw new Error("car not found");
     }
-    return order;
+    return car;
   }
   catch(error){
     throw new Error(error.message)
   }
-
 }
-
 module.exports= {
   createOrder,
   getOrder,

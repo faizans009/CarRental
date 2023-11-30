@@ -29,14 +29,21 @@ exports.getOrder = async (req, res) => {
 };
 
 exports.updateStatus = async (req,res) => {
-    try{
-        const {orderId, status} = req.body;
-        const newOrder = await orderService.updateStatus(orderId, {status}) 
+  if (req.user._id && req.user.admin){
+     try{
+      
+        const {carId, status} = req.body;
+        const newOrder = await orderService.updateStatus(carId, {status}) 
         
         return new ResponseHandler(res, 200,true,"status Updated",newOrder )
         
     }
     catch(error){
       return new ResponseHandler(res, 500,false,error.message )
-    }
+    } 
+    
+  }
+  else{
+    return new ResponseHandler(res, 403, false, "Unauthorized. Only admin users can create cars.");
+  }
 }

@@ -49,8 +49,14 @@ const carSchema = new mongoose.Schema({
         type: String
     },
     price: {
-        type: Number
-    }
+        type: Number,
+        requires: true
+    },
+    status: {
+        type: String,
+        enum: ['available','booked', 'rented'],
+        default:  'available'
+      }
 
 })
 Cars = mongoose.model('Car', carSchema);

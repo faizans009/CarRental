@@ -80,11 +80,6 @@ const orderSchema = new mongoose.Schema({
   },
   totalPrice: {
     type: Number,
-  },
-  status: {
-    type: String,
-    enum: [ 'accepted', 'rented', 'completed'],
-    default:  'accepted'
   }
 
 });

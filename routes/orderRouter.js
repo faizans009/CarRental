@@ -5,5 +5,5 @@ const order = require('../controllers/orderController')
 router
 .post("/createOrder", isAuthenticatedUser, order.createOrder) 
 .get("/getOrder", isAuthenticatedUser, order.getOrder)
-.put("/updateStatus",  order.updateStatus)
+.put("/updateStatus",isAuthenticatedUser,  order.updateStatus)
 exports.router = router
