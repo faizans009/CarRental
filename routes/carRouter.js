@@ -10,4 +10,4 @@ router
     .put('/updateCar/:id', isAuthenticatedUser, upload.array('image', 6), car.updateCar)
     .delete('/deleteCar/:id', isAuthenticatedUser, car.deleteCar)
  
-exports.router = router 
+exports.router = router  
