@@ -20,7 +20,7 @@ exports.signUp = async (req, res) => {
    newUser.otp.value=otp
   //  user.otp.value = otp;
   newUser.otp.createdAt = new Date(Date.now())
-  newUser.otp.expiresAt = new Date(newUser.otp.createdAt.getTime() + 60 * 1000);
+  newUser.otp.expiresAt = new Date(newUser.otp.createdAt.getTime() + 2 * 60 * 1000);
     // await user.save();
     // newUser.token = token;
     await newUser.save();
@@ -59,7 +59,7 @@ exports.signIn = async (req, res) => {
       sendEmail(email,otp)
       const value=otp
       const createdAt = new Date(Date.now())
-      const expiresAt = new Date(createdAt.getTime() + 60 * 1000);
+      const expiresAt = new Date(createdAt.getTime() + 2 * 60 * 1000);
       const Otp={value,createdAt,expiresAt}
       
       await User.findByIdAndUpdate(user._id, { Otp});

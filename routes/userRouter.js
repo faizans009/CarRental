@@ -11,7 +11,7 @@ router.
     // .post('/email', userEmail.sendEmail)
     .post('/login', userCRUD.signIn)
     .post('/validateOTP', userCRUD.validateOTP)
-    .post('/resetPassword', userCRUD.resetPassword)
+    .post('/resetPassword',isAuthenticatedUser, userCRUD.resetPassword)
     .patch('/updateProfile/:id',isAuthenticatedUser,upload.single('profileImage'), userCRUD.profile)
     
 
