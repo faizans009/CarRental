@@ -1,9 +1,6 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const generateToken = require("../middlewares/jwt");
-const { sendEmail } = require("../controllers/emailController");
-const { generateOTP } = require("../controllers/OTPGenerate");
-const ResponseHandler = require("../utils/responseHandler")
 // signup
 async function signUp({ username, email, password, mobile, admin }) {
   try {
@@ -88,7 +85,7 @@ async function validateOTP({ res, email, enteredOTP }) {
   }
 }
 // reset password
-async function resetPassword({ email, newPassword, confirmPassword }) {
+async function resetPassword({ email,otp, newPassword, confirmPassword }) {
   try {
     const user = await User.findOne({ email });
     if (!user) {

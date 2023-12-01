@@ -16,13 +16,9 @@ exports.signUp = async (req, res) => {
     });
     otp = generateOTP();
    sendEmail(email, otp);
-    // const token = generateToken(res,newUser);
    newUser.otp.value=otp
-  //  user.otp.value = otp;
   newUser.otp.createdAt = new Date(Date.now())
   newUser.otp.expiresAt = new Date(newUser.otp.createdAt.getTime() + 2 * 60 * 1000);
-    // await user.save();
-    // newUser.token = token;
     await newUser.save();
     return new ResponseHandler(res, 201,true,"New user created successfully",newUser )
    
@@ -91,8 +87,14 @@ exports.resetPassword = async (req, res) => {
   const { email, newPassword, confirmPassword } = req.body;
 
   try {
-    const user = await userService.resetPassword({ email, newPassword, confirmPassword });
-    
+
+    // const user = await userService.resetPassword({ email, newPassword, confirmPassword });
+     const otp = generateOTP();
+      sendEmail(email,otp)
+      const value=otp
+      const createdAt = new Date(Date.now())
+      const expiresAt = new Date(createdAt.getTime() + 2 * 60 * 1000);
+      const Otp={value,createdAt,expiresAt}
     return new ResponseHandler(res, user.status, user.success, user.message)
   } catch (error) {
     return new ResponseHandler(res, 500,false,error.message )
