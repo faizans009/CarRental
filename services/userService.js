@@ -47,13 +47,14 @@ async function signIn(res, email, password) {
     }
 
     const matchPassword = await bcrypt.compare(password, existingUser.password);
-
+    
+    
     if (!matchPassword) {
       throw new Error("Wrong password");
     }
     return  existingUser ;
   } catch (error) {
-    throw error;
+    return { error: error.message };
   }
 }
 // validate otp
