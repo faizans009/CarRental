@@ -1,13 +1,16 @@
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const generateToken = require("../middlewares/jwt");
+const { sendEmail } = require("../controllers/emailController");
+const { generateOTP } = require("../controllers/OTPGenerate");
+const ResponseHandler = require("../utils/responseHandler")
 // signup
 async function signUp({ username, email, password, mobile, admin }) {
   try {
     const existingUser = await User.findOne({ email: email });
     if (existingUser) {
       throw new Error("User already exists");
-    }
+    } 
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
       username,
@@ -17,6 +20,7 @@ async function signUp({ username, email, password, mobile, admin }) {
       admin,
     });
     return newUser;
+
   } catch (error) {
     throw new Error(error.message);
   }
@@ -47,10 +51,7 @@ async function signIn(res, email, password) {
     if (!matchPassword) {
       throw new Error("Wrong password");
     }
-
-    const token = generateToken(res, existingUser);
-
-    return { user: existingUser, token };
+    return  existingUser ;
   } catch (error) {
     throw error;
   }
@@ -69,9 +70,10 @@ async function validateOTP({ res, email, enteredOTP }) {
     if (user.otp.value !== parsedEnteredOTP) {
       throw new Error("Invalid OTP");
     }
-    if (user.otp.value !== parsedEnteredOTP) {
+    if (user.otp.expiresAt < new Date()) {
       throw new Error("OTP expired");
     }
+    user.emailVerified=true;
     await user.save();
     const token = generateToken(res, user);
     return {

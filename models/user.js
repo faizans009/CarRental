@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
       default: null,
     },
   },
+  emailVerified: {
+    type: Boolean,
+    default: false,
+  },
   gender: {
     type: String
   },
@@ -52,6 +56,10 @@ const userSchema = new mongoose.Schema({
     ref: 'Car',
     }
 }],
+date: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
 

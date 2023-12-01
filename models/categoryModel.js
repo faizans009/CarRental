@@ -6,7 +6,11 @@ const categorySchema = new mongoose.Schema({
     },
     companyName : {
         type: String
-    }
+    },
+    date: {
+        type: Date,
+        default: Date.now,
+      },
 })
 
 Category = mongoose.model('Category', categorySchema);

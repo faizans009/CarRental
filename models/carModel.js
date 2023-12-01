@@ -56,7 +56,11 @@ const carSchema = new mongoose.Schema({
         type: String,
         enum: ['available','booked', 'rented'],
         default:  'available'
-      }
+      },
+      date: {
+          type: Date,
+          default: Date.now,
+        },
 
 })
 Cars = mongoose.model('Car', carSchema);

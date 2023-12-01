@@ -80,7 +80,11 @@ const orderSchema = new mongoose.Schema({
   },
   totalPrice: {
     type: Number,
-  }
+  },
+  date: {
+      type: Date,
+      default: Date.now,
+    },
 
 });
 Order = mongoose.model("Order", orderSchema);

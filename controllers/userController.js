@@ -1,7 +1,9 @@
+const User = require("../models/user");
 const userService = require('../services/userService')
 const generateToken = require("../middlewares/jwt");
 const ResponseHandler = require("../utils/responseHandler")
-const bcrypt = require("bcrypt");
+const { generateOTP } = require("./OTPGenerate");
+const { sendEmail } = require("./emailController");
 
 exports.signUp = async (req, res) => {
   const { username, email, password, mobile,admin } = req.body;
@@ -12,10 +14,15 @@ exports.signUp = async (req, res) => {
       password,
       mobile
     });
-
-    const token = generateToken(res,newUser);
-
-    newUser.token = token;
+    otp = generateOTP();
+   sendEmail(email, otp);
+    // const token = generateToken(res,newUser);
+   newUser.otp.value=otp
+  //  user.otp.value = otp;
+  newUser.otp.createdAt = new Date(Date.now())
+  newUser.otp.expiresAt = new Date(newUser.otp.createdAt.getTime() + 60 * 1000);
+    // await user.save();
+    // newUser.token = token;
     await newUser.save();
     return new ResponseHandler(res, 201,true,"New user created successfully",newUser )
    
@@ -44,22 +51,36 @@ exports.getUser = async(req,res) => {
 
 
 exports.signIn = async (req, res) => {
-  
   try {
-    
     const { email, password } = req.body;
-    const { user, token } = await userService.signIn(res, email, password )
+    const user = await userService.signIn(res, email, password )
+    if(user.emailVerified===false){
+      const otp = generateOTP();
+      sendEmail(email,otp)
+      const value=otp
+      const createdAt = new Date(Date.now())
+      const expiresAt = new Date(createdAt.getTime() + 60 * 1000);
+      const Otp={value,createdAt,expiresAt}
+      
+      await User.findByIdAndUpdate(user._id, { Otp});
+      return new ResponseHandler(res, 400, false, "plz verify your account first");
+    }
 
+    const token = generateToken(res, user);
     return new ResponseHandler(res, 201, true, "Sign in Successfully", { user, token });
   } catch (error) {
-    return new ResponseHandler(res, 500, false, error.message || "Internal server error");
+    return new ResponseHandler(res, 500, false,"Internal server error");
   }
 };
 exports.validateOTP = async (req, res) => {
   const { email, enteredOTP } = req.body;
   try {
     const validate = await userService.validateOTP({ res,email,enteredOTP });
-    return new ResponseHandler(res, validate.status, validate.success, validate.message, validate.data)
+    if (validate.success) {
+      return new ResponseHandler(res, validate.status, validate.success, validate.message, validate.data);
+    } else {
+      return new ResponseHandler(res, validate.status, validate.success, validate.message);
+    }
   } catch (error) {
     return new ResponseHandler(res, 500,false,error.message )
   

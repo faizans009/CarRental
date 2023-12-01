@@ -15,6 +15,10 @@ const contactUsSchema = new mongoose.Schema({
     message: {
         type: String
     },
+    date: {
+        type: Date,
+        default: Date.now,
+      },
 })
 const ContactUs = mongoose.model('ContactUs',contactUsSchema)
 module.exports = ContactUs;
