@@ -17,7 +17,7 @@ async function signUp({ username, email, password, mobile, admin }) {
       admin,
     });
     return newUser;
-
+ 
   } catch (error) {
     throw new Error(error.message);
   }
@@ -25,13 +25,15 @@ async function signUp({ username, email, password, mobile, admin }) {
 // get user
 async function getUser(id) {
   try {
-    const user = await User.findById(id);
+    const user = await User.findOne({_id:id});
     if (!user) {
+      // return { status: 404, success: false, message: "User not found" };
       throw new Error("User not found");
     }
     return user;
   } catch (error) {
-    throw new Error(error.message);
+
+    throw new Error(error.stack);
   }
 }
 // sign in
@@ -40,14 +42,13 @@ async function signIn(res, email, password) {
     const existingUser = await User.findOne({ email });
 
     if (!existingUser) {
-      throw new Error("User not found");
+      return { status: 404, success: false, message: "User not found" };
+      // throw new Error("User not found");
     }
-
     const matchPassword = await bcrypt.compare(password, existingUser.password);
-    
-    
     if (!matchPassword) {
-      throw new Error("Wrong password");
+      return { status: 400, success: false, message: "Wrong password" };
+      // throw new Error("Wrong password");
     }
     return  existingUser ;
   } catch (error) {
@@ -84,20 +85,33 @@ async function validateOTP({ res, email, enteredOTP }) {
     throw new Error(error.message);
   }
 }
+
+
+// forgot password services
+async function forgetPassword({email}){
+  try{
+    const user = await User.findOne({ email })
+    
+    return user
+  }
+  catch(error){
+    throw new Error(error.message);
+  }
+}
+
 // reset password
-async function resetPassword({ email,otp, newPassword, confirmPassword }) {
+
+
+async function resetPassword({ email, newPassword, confirmPassword }) {
   try {
     const user = await User.findOne({ email });
-    if (!user) {
+    if (!user) { 
       throw new Error("User not found");
-    }
-    if (newPassword !== confirmPassword) {
-      throw new Error("Password and confirm password do not match");
     }
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
     await user.save();
-    return { status: 200, success: true, message: "Password reset successful" };
+    return user;
   } catch (error) {
     throw new Error(error.message);
   }
@@ -131,6 +145,7 @@ module.exports = {
   getUser,
   signIn,
   validateOTP,
+  forgetPassword,
   resetPassword,
   profile
 };

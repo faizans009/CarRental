@@ -29,7 +29,7 @@ async function createOrder({
         if (!user && !car){
             throw new Error("User and Car not found")
         }
-        const existingOrder = await Car.findOne({ status: { $in: ['booked', 'rented'] }});
+        const existingOrder = await Car.findOne({ status: { $in: ['booked'] }});
         if (existingOrder) {
             throw new Error("Car is already booked");
           }

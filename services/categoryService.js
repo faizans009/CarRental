@@ -5,9 +5,10 @@ const Car = require("../models/carModel");
 async function createCategory(data){
     try{
         const existingCategory = await User.findOne({
-            companyName: data.companyName,
+            companyName: Category.companyName,
           });
           if (existingCategory) {
+            // return { status: 400, success: false, message: "Category already exists" };
             throw new Error("Category already exists");
           }
           const newCategory = await Category.create({

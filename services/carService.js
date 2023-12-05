@@ -86,9 +86,7 @@ async function updateCar(id, updateData) {
   
       const updatedCar = await Car.findByIdAndUpdate(id, updateData, { new: true });
   
-      if (!updatedCar) {
-        throw new Error("Car not found");
-      }
+     
   
       return updatedCar;
     } catch (error) {

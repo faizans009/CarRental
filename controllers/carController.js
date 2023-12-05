@@ -64,7 +64,9 @@ exports.updateCar = async (req, res) => {
       updateData.image =  req.files.map((file) => file.path);
     }
     const updatedCar = await carService.updateCar(id, updateData);
-
+    if (!updatedCar) {
+      return new ResponseHandler(res, 404,false,"Car not found")
+    }
 
     return new ResponseHandler(res, 200,true,"Car Updated",updatedCar)
   

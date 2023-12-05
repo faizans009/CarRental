@@ -6,12 +6,13 @@ const {upload} = require('../middlewares/multer');
 const { isAuthenticatedUser } = require('../middlewares/auth');
 
 router.
-    post('/signup', userCRUD.signUp)
+    post('/signup',isAuthenticatedUser, userCRUD.signUp)
     .get('/getUser',isAuthenticatedUser, userCRUD.getUser)
     // .post('/email', userEmail.sendEmail)
     .post('/login', userCRUD.signIn)
     .post('/validateOTP', userCRUD.validateOTP)
-    .post('/resetPassword',isAuthenticatedUser, userCRUD.resetPassword)
+    .post('/forgetPassword', userCRUD.forgetPassword)
+    .post('/resetPassword', userCRUD.resetPassword)
     .patch('/updateProfile/:id',isAuthenticatedUser,upload.single('profileImage'), userCRUD.profile)
     
 

@@ -7,7 +7,7 @@ router
     .post('/createCar', isAuthenticatedUser, upload.array('image', 6), car.createCar)
     .get('/getAllCars', car.getAllCars)
     .get('/getOneCar/:id', car.getOneCar)
-    .put('/updateCar/:id', isAuthenticatedUser, upload.array('image', 6), car.updateCar)
+    .patch('/updateCar/:id', isAuthenticatedUser, upload.array('image', 6), car.updateCar)
     .delete('/deleteCar/:id', isAuthenticatedUser, car.deleteCar)
  
 exports.router = router  
