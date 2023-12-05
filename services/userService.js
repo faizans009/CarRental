@@ -17,7 +17,7 @@ async function signUp({ username, email, password, mobile, admin }) {
       admin,
     });
     return newUser;
- 
+  
   } catch (error) {
     throw new Error(error.message);
   }

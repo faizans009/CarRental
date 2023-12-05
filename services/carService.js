@@ -58,7 +58,7 @@ async function getAllCars(){
       throw new Error(error.message);
     }
 }
-// get one
+// get one 
 async function getOneCar(id){
     try{
         const car = await Car.findById(id);
