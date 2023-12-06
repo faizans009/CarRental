@@ -7,6 +7,8 @@ const { sendEmail } = require("./emailController");
 
 exports.signUp = async (req, res) => {
   const { username, email, password, mobile, admin } = req.body;
+  console.log(req.body);
+  
   try {
     const newUser = await userService.signUp({
       username,

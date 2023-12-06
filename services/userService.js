@@ -8,6 +8,10 @@ async function signUp({ username, email, password, mobile, admin }) {
     if (existingUser) {
       throw new Error("User already exists");
     } 
+    if(username === '' || email === '' || password === '' || mobile === '' ){
+      throw new Error("Please fill all the fields");
+
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await User.create({
       username,
