@@ -8,7 +8,7 @@ async function signUp({ username, email, password, mobile, admin }) {
     if (existingUser) {
       throw new Error("User already exists");
     } 
-    if(username === '' || email === '' || password === '' || mobile === '' ){
+    if(!username || !email  || !password || !mobile  ){
       throw new Error("Please fill all the fields");
 
     }
@@ -60,22 +60,22 @@ async function signIn(res, email, password) {
   }
 }
 // validate otp
-async function validateOTP({ res, enteredOTP }) {
+async function validateOTP({ res, enteredOTP,id }) {
   try {
-    const user = await User.findOne({"otp.value": enteredOTP });
+    const user = await User.findOne({_id:id});
     if (!user) {
       throw new Error("User not found");
     }
-    const parsedEnteredOTP = parseInt(enteredOTP, 10);
-    if (isNaN(parsedEnteredOTP)) {
-      throw new Error("Invalid OTP format");
-    }
-    if (user.otp.value !== parsedEnteredOTP ) {
+    // const parsedEnteredOTP = parseInt(enteredOTP, 10);
+    // if (isNaN(parsedEnteredOTP)) {
+    //   throw new Error("Invalid OTP format");
+    // }
+    if (user.otp.value !== enteredOTP ) {
       throw new Error("Invalid OTP");
     }
-    if (user.otp.expiresAt < new Date()) {
-      throw new Error("OTP expired");
-    }
+    // if (user.otp.expiresAt < new Date()) {
+    //   throw new Error("OTP expired");
+    // }
     user.emailVerified=true;
     await user.save();
     const token = generateToken(res, user);

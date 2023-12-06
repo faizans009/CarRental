@@ -96,9 +96,9 @@ exports.signIn = async (req, res) => {
   }
 };
 exports.validateOTP = async (req, res) => {
-  const {enteredOTP } = req.body;
+  const {enteredOTP,id } = req.body;
   try {
-    const validate = await userService.validateOTP({ res, enteredOTP });
+    const validate = await userService.validateOTP({ res, enteredOTP ,id});
     if (validate.success) {
       return new ResponseHandler(
         res,
