@@ -66,7 +66,7 @@ async function validateOTP({ res, enteredOTP }) {
     if (isNaN(parsedEnteredOTP)) {
       throw new Error("Invalid OTP format");
     }
-    if (user.otp.value !== parsedEnteredOTP || parsedEnteredOTP === "123456") {
+    if (user.otp.value !== parsedEnteredOTP ) {
       throw new Error("Invalid OTP");
     }
     if (user.otp.expiresAt < new Date()) {
