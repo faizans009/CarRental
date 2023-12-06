@@ -19,7 +19,7 @@ exports.signUp = async (req, res) => {
     newUser.otp.value = otp;
     newUser.otp.createdAt = new Date(Date.now());
     newUser.otp.expiresAt = new Date(
-      newUser.otp.createdAt.getTime() + 2 * 60 * 1000
+      newUser.otp.createdAt.getTime() + 5 * 60 * 1000
     );
     await newUser.save();
     return new ResponseHandler(
@@ -71,7 +71,7 @@ exports.signIn = async (req, res) => {
       sendEmail(email, otp);
       const value = otp;
       const createdAt = new Date(Date.now());
-      const expiresAt = new Date(createdAt.getTime() + 2 * 60 * 1000);
+      const expiresAt = new Date(createdAt.getTime() + 5 * 60 * 1000);
       const Otp = { value, createdAt, expiresAt };
 
       await User.findByIdAndUpdate(user._id, { Otp });
@@ -93,9 +93,9 @@ exports.signIn = async (req, res) => {
   }
 };
 exports.validateOTP = async (req, res) => {
-  const { email, enteredOTP } = req.body;
+  const {enteredOTP } = req.body;
   try {
-    const validate = await userService.validateOTP({ res, email, enteredOTP });
+    const validate = await userService.validateOTP({ res, enteredOTP });
     if (validate.success) {
       return new ResponseHandler(
         res,
@@ -129,7 +129,7 @@ exports.forgetPassword = async (req, res) => {
 
     // const value=otp
     const createdAt = new Date(Date.now());
-    const expiresAt = new Date(createdAt.getTime() + 2 * 60 * 1000);
+    const expiresAt = new Date(createdAt.getTime() + 5 * 60 * 1000);
     user.otp = { value: otp, createdAt, expiresAt };
     await user.save();
 

@@ -1,16 +1,16 @@
 const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema({
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true
-    },
-    car: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Car',
-        required: true
-    },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  car: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Car",
+    required: true,
+  },
   Name: {
     type: String,
     required: true,
@@ -76,16 +76,20 @@ const orderSchema = new mongoose.Schema({
     required: true,
   },
   totalDays: {
-    type: Number
+    type: Number,
   },
   totalPrice: {
     type: Number,
   },
   date: {
-      type: Date,
-      default: Date.now,
-    },
-
+    type: Date,
+    default: Date.now,
+  },
+  status: {
+    type: String,
+    enum: ["booked", "cancel","completed"],
+    default: "available",
+  },
 });
 Order = mongoose.model("Order", orderSchema);
 module.exports = Order;

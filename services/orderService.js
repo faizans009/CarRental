@@ -22,7 +22,6 @@ async function createOrder({
 })
 {
     try{
-
         const user = await User.findOne({ _id: userId });
         const car = await Car.findOne({ _id: carId });
 

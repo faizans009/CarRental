@@ -56,9 +56,9 @@ async function signIn(res, email, password) {
   }
 }
 // validate otp
-async function validateOTP({ res, email, enteredOTP }) {
+async function validateOTP({ res, enteredOTP }) {
   try {
-    const user = await User.findOne({ email });
+    const user = await User.findOne({"otp.value": enteredOTP });
     if (!user) {
       throw new Error("User not found");
     }
@@ -66,7 +66,7 @@ async function validateOTP({ res, email, enteredOTP }) {
     if (isNaN(parsedEnteredOTP)) {
       throw new Error("Invalid OTP format");
     }
-    if (user.otp.value !== parsedEnteredOTP) {
+    if (user.otp.value !== parsedEnteredOTP || parsedEnteredOTP === "123456") {
       throw new Error("Invalid OTP");
     }
     if (user.otp.expiresAt < new Date()) {
