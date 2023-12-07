@@ -137,7 +137,7 @@ exports.forgetPassword = async (req, res) => {
     const createdAt = new Date(Date.now());
     const expiresAt = new Date(createdAt.getTime() + 5 * 60 * 1000);
     user.otp = { value: otp, createdAt, expiresAt };
-    await user.save();
+    await user.save(); 
 
     return new ResponseHandler(res, 200, true, "OTP sent to your email",{email});
   } catch (error) {
