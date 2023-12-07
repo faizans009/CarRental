@@ -30,7 +30,7 @@ exports.signUp = async (req, res) => {
       201,
       true,
       "New user created successfully",
-      newUser
+      email
     );
   } catch (error) {
     return new ResponseHandler(res, 500, false, error.message);
@@ -139,7 +139,7 @@ exports.forgetPassword = async (req, res) => {
     user.otp = { value: otp, createdAt, expiresAt };
     await user.save();
 
-    return new ResponseHandler(res, 200, true, "OTP sent to your email",email);
+    return new ResponseHandler(res, 200, true, "OTP sent to your email",{email});
   } catch (error) {
     return new ResponseHandler(res, 500, false, error.message);
   }
