@@ -16,8 +16,8 @@ exports.signUp = async (req, res) => {
       password,
       mobile,
     });
-    otp = generateOTP();
-    // otp = '123456';
+    // otp = generateOTP();
+    otp = '123456';
     sendEmail(email, otp);
     newUser.otp.value = otp;
     newUser.otp.createdAt = new Date(Date.now());
