@@ -70,7 +70,8 @@ exports.signIn = async (req, res) => {
     }
   
     if (user.emailVerified === false) {
-      const otp = generateOTP();
+      // const otp = generateOTP();
+      const otp = 123456;
       sendEmail(email, otp);
       const value = otp;
       const createdAt = new Date(Date.now());
@@ -129,10 +130,10 @@ exports.forgetPassword = async (req, res) => {
     if (!user) { 
       return new ResponseHandler(res, 404, false, "User not found");
     }
-    const otp = generateOTP();
+    // const otp = generateOTP();
+    const otp = 123456;
     sendEmail(email, otp);
 
-    // const value=otp
     const createdAt = new Date(Date.now());
     const expiresAt = new Date(createdAt.getTime() + 5 * 60 * 1000);
     user.otp = { value: otp, createdAt, expiresAt };
