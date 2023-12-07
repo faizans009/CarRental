@@ -75,9 +75,11 @@ exports.signIn = async (req, res) => {
       const value = otp;
       const createdAt = new Date(Date.now());
       const expiresAt = new Date(createdAt.getTime() + 5 * 60 * 1000);
-      const Otp = { value, createdAt, expiresAt };
-
-      await User.findByIdAndUpdate(user._id, { Otp });
+      user.otp = { value, createdAt, expiresAt };
+      await user.save()
+      console.log(user.otp);
+      
+      // await User.findByIdAndUpdate(user._id, { otp });
       return new ResponseHandler(
         res,
         400,
@@ -136,7 +138,7 @@ exports.forgetPassword = async (req, res) => {
     user.otp = { value: otp, createdAt, expiresAt };
     await user.save();
 
-    return new ResponseHandler(res, 200, true, "OTP sent to your email");
+    return new ResponseHandler(res, 200, true, "OTP sent to your email",email);
   } catch (error) {
     return new ResponseHandler(res, 500, false, error.message);
   }
