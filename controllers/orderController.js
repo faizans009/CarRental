@@ -1,11 +1,58 @@
 const orderService = require('../services/orderService')
 const ResponseHandler = require("../utils/responseHandler") 
-
+const Order = require("../models/orderModel");
+const Car = require("../models/carModel");
+const User = require("../models/user");
 exports.createOrder = async (req, res) => {
   try {
    
     const orderDetails = req.body;
-    const order = await orderService.createOrder(orderDetails);
+    // const order = await orderService.createOrder(orderDetails);
+    const existingOrder = await orderService.aggregate([
+      {
+        $match: {
+          car: mongoose.Types.ObjectId(orderDetails.carId),
+          status: 'booked',
+          // $or: [
+          //   {
+          //     $and: [
+          //       { "Pickup.date": { $lte: new Date(orderDetails.dropOffDate) } },
+          //       { "DropOff.date": { $gte: new Date(orderDetails.pickupDate) } },
+          //     ],
+          //   },
+          //   {
+          //     $and: [
+          //       { "Pickup.date": { $lte: new Date(orderDetails.pickupDate) } },
+          //       { "DropOff.date": { $gte: new Date(orderDetails.dropOffDate) } },
+          //     ],
+          //   },
+          //   {
+          //     $and: [
+          //       { "Pickup.date": { $lte: new Date(orderDetails.dropOffDate) } },
+          //       { "DropOff.date": { $gte: new Date(orderDetails.dropOffDate) } },
+          //     ],
+          //   },
+          // ],
+          $or: [
+            {
+              $and: [
+                { "Pickup.date": { $lt: pickupDate } },
+                { "DropOff.date": { $lte: pickupDate } }
+              ]
+            },
+            {
+              $and: [
+                { "Pickup.date": { $gte: dropOffDate } },
+                { "DropOff.date": { $gt: dropOffDate } }
+              ]
+            }
+          ]
+        },
+      },
+    ])
+    if (existingOrder.length > 0) {
+      return new ResponseHandler(res, 400, false, "Car is already booked for the selected dates and times");
+    }
 
     return new ResponseHandler(res, 200,true,"Car rented successfully",order )
   } catch (error) {
