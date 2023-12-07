@@ -60,9 +60,9 @@ async function signIn(res, email, password) {
   }
 }
 // validate otp
-async function validateOTP({ res, enteredOTP,id }) {
+async function validateOTP({ res, enteredOTP,email }) {
   try {
-    const user = await User.findOne({_id:id});
+    const user = await User.findOne({email});
     if (!user) {
       throw new Error("User not found");
     }
@@ -73,9 +73,9 @@ async function validateOTP({ res, enteredOTP,id }) {
     if (user.otp.value !== enteredOTP ) {
       throw new Error("Invalid OTP");
     }
-    // if (user.otp.expiresAt < new Date()) {
-    //   throw new Error("OTP expired");
-    // }
+    if (user.otp.expiresAt < new Date()) {
+      throw new Error("OTP expired");
+    }
     user.emailVerified=true;
     await user.save();
     const token = generateToken(res, user);

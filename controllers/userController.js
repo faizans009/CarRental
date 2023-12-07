@@ -16,8 +16,8 @@ exports.signUp = async (req, res) => {
       password,
       mobile,
     });
-    // otp = generateOTP();
-    otp = '123456';
+    otp = generateOTP();
+    // otp = '123456';
     sendEmail(email, otp);
     newUser.otp.value = otp;
     newUser.otp.createdAt = new Date(Date.now());
@@ -96,9 +96,9 @@ exports.signIn = async (req, res) => {
   }
 };
 exports.validateOTP = async (req, res) => {
-  const {enteredOTP,id } = req.body;
+  const {enteredOTP,email } = req.body;
   try {
-    const validate = await userService.validateOTP({ res, enteredOTP ,id});
+    const validate = await userService.validateOTP({ res, enteredOTP ,email});
     if (validate.success) {
       return new ResponseHandler(
         res,
