@@ -30,7 +30,7 @@ exports.signUp = async (req, res) => {
       201,
       true,
       "New user created successfully",
-      email
+      newUser
     );
   } catch (error) {
     return new ResponseHandler(res, 500, false, error.message);
