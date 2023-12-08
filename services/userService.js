@@ -83,7 +83,7 @@ async function validateOTP({ res, enteredOTP,email }) {
       status: 200,
       success: true,
       message: "OTP is valid",
-      data: { token },
+      data: { token ,email},
     };
   } catch (error) {
     throw new Error(error.message);

@@ -108,7 +108,8 @@ exports.validateOTP = async (req, res) => {
         validate.status,
         validate.success,
         validate.message,
-        validate.data
+        validate.data,
+        email
       );
     } else {
       return new ResponseHandler(
@@ -116,6 +117,7 @@ exports.validateOTP = async (req, res) => {
         validate.status,
         validate.success,
         validate.message
+        
       );
     }
   } catch (error) {
