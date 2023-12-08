@@ -106,7 +106,7 @@ async function forgetPassword({email}){
 // reset password
 
 
-async function resetPassword({ email, newPassword, confirmPassword }) {
+async function resetPassword({ email, newPassword}) {
   try {
     const user = await User.findOne({ email });
     if (!user) { 

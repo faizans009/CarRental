@@ -28,78 +28,89 @@ exports.createOrder = async (req, res) => {
     const car = await Car.findOne({ _id: carId });
 
     if (!user) {
-      return new ResponseHandler(res,404,false,"Car is already booked for the selected dates and times");
+      return new ResponseHandler(
+        res,
+        404,
+        false,
+        "Car is already booked for the selected dates and times"
+      );
     }
     if (!car) {
-      return new ResponseHandler(res,404,false,"Car is already booked for the selected dates and times");
+      return new ResponseHandler(
+        res,
+        404,
+        false,
+        "Car is already booked for the selected dates and times"
+      );
     }
-    try{
 
-      const existingOrder = await Order.aggregate([
-        {
-          $match: {
-            car: new mongoose.Types.ObjectId(carId),
-            status: "booked",
-            $or: [
-              {
-                $and: [
-                  // { "Pickup.date": { $lte: new Date(dropOffDate) } },
-                  { "Pickup.date": { $lte: new Date(pickupDate ) } },
-                  { "DropOff.date": { $gte: new Date(pickupDate) } },
-                ],
-              },
-              {
-                $and: [
-                  { "Pickup.date": { $lte: new Date(dropOffDate) } },
-                  // { "Pickup.date": { $lte: new Date(pickupDate) } },
-                  {"DropOff.date": { $gte: new Date(pickupDate) },},
-                  // {"DropOff.date": { $gte: new Date(dropOffDate) },},
-                ],
-              },
-              {
-                $and: [
-                  { "Pickup.date": { $lte: new Date(dropOffDate) } },
-                  {
-                    "DropOff.date": { $gte: new Date(dropOffDate) },
-                  },
-                ],
-              },
-            ],
-            // $or: [
-            //   {
-            //     $and: [
-            //       { "Pickup.date": { $lt: pickupDate } },
-            //       { "DropOff.date": { $lte: pickupDate } }
-            //     ]
-            //   },
-            //   {
-            //     $and: [
-            //       { "Pickup.date": { $gte: dropOffDate } },
-            //       { "DropOff.date": { $gt: dropOffDate } }
-            //     ]
-            //   }
-            // ]
-          },
+    const existingOrder = await Order.aggregate([
+      {
+        $match: {
+          car: new mongoose.Types.ObjectId(carId),
+          status: "booked",
+          // $or: [
+          //   {
+          //     $and: [
+          //       { "Pickup.date": { $lt: pickupDate } },
+          //       { "DropOff.date": { $gt: pickupDate } },
+          //     ],
+          //   },
+          //   {
+          //     $and: [
+          //       { "Pickup.date": { $lt: dropOffDate } },
+          //       { "DropOff.date": { $gt: pickupDate } },
+          //     ],
+          //   },
+          //   {
+          //     $and: [
+          //       { "Pickup.date": { $lt: dropOffDate } },
+          //       { "DropOff.date": { $gt: pickupDate } },
+          //     ],
+          //   },
+          // ],
+          $or: [
+            {
+              $and: [
+                { "Pickup.date": { $lte: pickupDate } },
+                { "DropOff.date": { $gte: pickupDate } },
+              ],
+            },
+            {
+              $and: [
+                { "Pickup.date": { $lte: dropOffDate } },
+                { "DropOff.date": { $gte: pickupDate } },
+              ],
+            },
+            {
+              $and: [
+                { "Pickup.date": { $lte: dropOffDate } },
+                { "DropOff.date": { $gte: pickupDate } },
+              ],
+            },
+          ],
         },
-      ]);
-      if (existingOrder.length === 0) {
-        return new ResponseHandler(res,400,false,"Car is already booked for the selected dates and times");
-      }
-      
-    }
-    catch(error){
-      console.log(error.message);
-      
+      },
+    ]);
+    if (existingOrder.length > 0) {
+      return new ResponseHandler(
+        res,
+        400,
+        false,
+        "Car is already booked for the selected dates and times"
+      );
     }
 
     const pickupDateTime = new Date(`${pickupDate} ${pickupTime}`);
-    const dropOffDateTime = new Date(`${dropOffDate} ${dropOffTime}`); 
-    const timeDifference = Math.abs(dropOffDateTime.getTime() - pickupDateTime.getTime());
+    const dropOffDateTime = new Date(`${dropOffDate} ${dropOffTime}`);
+    const timeDifference = Math.abs(
+      dropOffDateTime.getTime() - pickupDateTime.getTime()
+    );
     const totalDays = Math.ceil(timeDifference / (1000 * 3600 * 24));
     const totalPrice = totalDays * car.price;
 
     const newOrderInfo = await Order.create({
-      user:userId,
+      user: userId,
       car: carId,
       Name: Name,
       PhoneNo: PhoneNo,
@@ -119,16 +130,13 @@ exports.createOrder = async (req, res) => {
       ExpDate: ExpDate,
       cardHolder: cardHolder,
       cvc: cvc,
-      price: car.price, 
+      price: car.price,
       totalDays: totalDays,
-      totalPrice: totalPrice, 
+      totalPrice: totalPrice,
     });
 
     // Update the car status to 'booked'
-    await Car.updateOne(
-      { _id: carId },
-      { $set: { status: "booked" } }
-    );
+    await Order.updateOne({ _id: newOrderInfo }, { $set: { status: "booked" } });
 
     return new ResponseHandler(
       res,
@@ -139,7 +147,6 @@ exports.createOrder = async (req, res) => {
     );
   } catch (error) {
     console.log(error.message);
-
     return new ResponseHandler(res, 500, false, error.message);
   }
 };

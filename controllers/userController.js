@@ -149,18 +149,14 @@ exports.forgetPassword = async (req, res) => {
 
 // reset password
 exports.resetPassword = async (req, res) => {
-  const { email, newPassword, confirmPassword } = req.body;
+  const { email, newPassword} = req.body;
   try {
     const user = await userService.resetPassword({
       email,
       newPassword,
-      confirmPassword,
-    });
+        });
     if (!user) { 
       return new ResponseHandler(res, 404, false, "User not found");
-    }
-    if (newPassword !== confirmPassword) {
-      return new ResponseHandler(res, 400, false, "Password and confirm password do not match");
     }
     return new ResponseHandler(res, 200, true, "Password reset successfully");
   } catch (error) {
