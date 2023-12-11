@@ -49,26 +49,6 @@ exports.createOrder = async (req, res) => {
         $match: {
           car: new mongoose.Types.ObjectId(carId),
           status: "booked",
-          // $or: [
-          //   {
-          //     $and: [
-          //       { "Pickup.date": { $lt: pickupDate } },
-          //       { "DropOff.date": { $gt: pickupDate } },
-          //     ],
-          //   },
-          //   {
-          //     $and: [
-          //       { "Pickup.date": { $lt: dropOffDate } },
-          //       { "DropOff.date": { $gt: pickupDate } },
-          //     ],
-          //   },
-          //   {
-          //     $and: [
-          //       { "Pickup.date": { $lt: dropOffDate } },
-          //       { "DropOff.date": { $gt: pickupDate } },
-          //     ],
-          //   },
-          // ],
           $or: [
             {
               $and: [
