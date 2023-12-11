@@ -83,7 +83,7 @@ exports.signIn = async (req, res) => {
       // await User.findByIdAndUpdate(user._id, { otp });
       return new ResponseHandler(
         res,
-        400,
+        401,
         false,
         "plz verify your account first"
       );
