@@ -7,7 +7,6 @@ const { sendEmail } = require("./emailController");
 
 exports.signUp = async (req, res) => {
   const { username, email, password, mobile, admin } = req.body;
-  // console.log(req.body);
   
   try {
     const newUser = await userService.signUp({
@@ -36,6 +35,8 @@ exports.signUp = async (req, res) => {
     return new ResponseHandler(res, 500, false, error.message);
   }
 };
+
+
 
 exports.getUser = async (req, res) => {
   if (req.user._id && req.user.admin) {
@@ -78,9 +79,6 @@ exports.signIn = async (req, res) => {
       const expiresAt = new Date(createdAt.getTime() + 5 * 60 * 1000);
       user.otp = { value, createdAt, expiresAt };
       await user.save()
-      // console.log(user.otp);
-      
-      // await User.findByIdAndUpdate(user._id, { otp });
       return new ResponseHandler(
         res,
         401,
@@ -163,6 +161,8 @@ exports.resetPassword = async (req, res) => {
     return new ResponseHandler(res, 500, false, error.message);
   }
 };
+
+
 
 exports.profile = async (req, res) => {
   try {

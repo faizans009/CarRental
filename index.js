@@ -23,7 +23,7 @@ dbConnection().catch((err) => console.log(err));
 async function dbConnection() {
   await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true });
   console.log("Database Connected");
-}
+} 
 const connection = mongoose.connection;
 connection.once("open", () => {
   console.log("Database Connection has been established successfully");
