@@ -7,7 +7,7 @@ exports.createContactUs = async (req, res) => {
         const newContact = await contactService.createContact({
             firstName: req.body.firstName,
             lastName: req.body.lastName,
-            email: req.body.email,
+            email: req.body.email,    
             phone: req.body.phone,
             message: req.body.message
         });

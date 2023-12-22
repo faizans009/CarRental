@@ -7,7 +7,6 @@ const mongoose = require("mongoose");
 exports.createOrder = async (req, res) => {
   try {
     const {
-      userId,
       carId,
       Name,
       PhoneNo,
@@ -24,6 +23,9 @@ exports.createOrder = async (req, res) => {
       cardHolder,
       cvc,
     } = req.body;
+    const userId=req.user.id
+    console.log(userId);
+    
     const user = await User.findOne({ _id: userId });
     const car = await Car.findOne({ _id: carId });
 
@@ -32,7 +34,7 @@ exports.createOrder = async (req, res) => {
         res,
         404,
         false,
-        "Car is already booked for the selected dates and times"
+        "user not found"
       );
     }
     if (!car) {
@@ -40,7 +42,7 @@ exports.createOrder = async (req, res) => {
         res,
         404,
         false,
-        "Car is already booked for the selected dates and times"
+        "Car not found"
       );
     }
 

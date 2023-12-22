@@ -87,7 +87,7 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["booked", "cancel","available",],
+    enum: ["booked", "cancel","available"],
     default: "available",
   },
 });

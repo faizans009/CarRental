@@ -13,14 +13,15 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String
   },
-  admin: {
-    type:Boolean,
-    default:false
-  },
-  // role: {
-  //   type: String,
-  //   default: 'user'
+  // admin: {
+  //   type:Boolean,
+  //   default:false
   // },
+  role: {
+    type: String,
+    enum: ["user", "superAdmin","admin"],
+    default: 'user'
+  },
   otp: {
     value: {
       type: Number,
@@ -38,21 +39,6 @@ const userSchema = new mongoose.Schema({
   emailVerified: {
     type: Boolean,
     default: false,
-  },
-  gender: {
-    type: String
-  },
-  postcode: {
-    type: Number
-  },
-  profileImage: {
-    type: String,
-  },
-  address: {
-    type: String
-  },
-  city:{
-    type: String
   },
   favouriteCar: [{
     car: {

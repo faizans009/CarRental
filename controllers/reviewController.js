@@ -3,8 +3,8 @@ const ResponseHandler = require("../utils/responseHandler")
 // create review
 exports.createReview = async (req, res) => {
   try {
-    const {userId, review, rating, carId } = req.body;
-    
+    const { review, rating, carId } = req.body;
+    const userId=req.user.id
     const newReview = await reviewService.createReview(userId, review, rating, carId)
     
     return new ResponseHandler(res, 200,true,"Review created successfully",newReview)

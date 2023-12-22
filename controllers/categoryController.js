@@ -1,19 +1,26 @@
+const Category = require("../models/categoryModel");
+const Car = require("../models/carModel");
 const categoryService = require('../services/categoryService');
 const fs = require("fs");
 const ResponseHandler = require("../utils/responseHandler")
 
 // create category
 exports.createCategory = async (req, res) => {
-  const { companyName } = req.body;
-
-  if (req.user._id && req.user.admin) {
+  if (
+    (req.user._id && req.user.role === "admin") ||
+    req.user.role === "superAdmin"
+  ) {
     try {
-      
-      const categoryImages = req.file.path;
+      const existingCategory = await Category.findOne({
+                    companyName: req.body.companyName,
+                  });
+                  if (existingCategory) {
+                    return new ResponseHandler(res, 400,false,"Category already exists" )
+                  }
 
-      const newCategory = await categoryService.createCategory({
-        categoryImage: categoryImages,
-        companyName: companyName,
+      const newCategory = await Category.create({
+        categoryImage: req.body.categoryImage,
+        companyName: req.body.companyName,
       });
       return new ResponseHandler(res, 200,true,"Category created successfully",newCategory )
     } catch (error) {
@@ -21,14 +28,19 @@ exports.createCategory = async (req, res) => {
       return new ResponseHandler(res, 500,false,error.message )
     }
   } else {
-    return new ResponseHandler(res, 403,true,"Unauthorized. Only admin can create category" )
-  } 
-};
+    return new ResponseHandler(
+      res,
+      403,
+      false,
+      "Unauthorized. Only admin can get users"
+    );
+  }
+  };
 
 // get all category
 exports.getCategory = async(req,res) => {
   try{
-    const category = await categoryService.getCategory()
+    const category = await Category.find()
     if (category.length === 0) {
       return new ResponseHandler(res, 404,false,"No categories found" )
     }
@@ -40,10 +52,10 @@ exports.getCategory = async(req,res) => {
   } 
 }
 
-exports.getCarByCategory = async(req,res) => {
+exports.getCarByCategory = async(req,res) => { 
   try{
-     const {companyName} = req.body;
-     const cars = await categoryService.getCarsByCategory(companyName);
+     const {companyName} = req.body; 
+     const cars = await Car.find({companyName});
      if (cars.length === 0) {
       return new ResponseHandler(res, 404,false,"No car found with that company" )
     }
@@ -58,7 +70,7 @@ exports.getCarByCategory = async(req,res) => {
 exports.getOneCategory = async(req,res) =>{
   const {id} = req.params
   try{
-      const category = await categoryService.getOneCategory(id)
+      const category = await Category.findById(id)
       if (!category) {
         return new ResponseHandler(res, 404,false,"Category not found" )
       }

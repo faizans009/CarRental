@@ -8,7 +8,7 @@ const userRouter = require("./routes/userRouter");
 const carRouter = require("./routes/carRouter");
 const categoryRouter = require("./routes/categoryRouter");
 const reviewRouter = require("./routes/reviewRouter");
-const verificationRouter = require("./routes/verificationRouter");
+const profileRouter = require("./routes/profileRouter");
 const contactUsRouter = require("./routes/contactUsRouter");
 const favouriteRouter = require("./routes/favouriteRouter");
 const orderRouter = require("./routes/orderRouter");
@@ -16,7 +16,7 @@ const cookieParser = require("cookie-parser");
 
 app.use(cors());
 app.use(express.json());
-app.use("/uploads/", express.static("uploads"));
+app.use("/uploads/", express.static("uploads")); 
 app.use(cookieParser());
 // Database
 dbConnection().catch((err) => console.log(err));
@@ -33,10 +33,11 @@ app.use("/auth", userRouter.router);
 app.use("/car", carRouter.router);
 app.use("/category", categoryRouter.router);
 app.use("/review", reviewRouter.router);
-app.use("/verification", verificationRouter.router);
+app.use("/profile", profileRouter.router);
 app.use("/contact", contactUsRouter.router); 
 app.use("/fav", favouriteRouter.router);
 app.use("/order", orderRouter.router);
+
 app.get('/',(req,res)=>{
   res.send('test')
 })

@@ -4,10 +4,12 @@ const car = require('../controllers/carController')
 const {upload} = require('../middlewares/multer');
 const { isAuthenticatedUser } = require('../middlewares/auth');
 router
-    .post('/createCar', isAuthenticatedUser, upload.array('image', 6), car.createCar)
+    .post('/createCar', isAuthenticatedUser, car.createCar)
     .get('/getAllCars', car.getAllCars)
     .get('/getOneCar/:id', car.getOneCar)
-    .patch('/updateCar/:id', isAuthenticatedUser, upload.array('image', 6), car.updateCar)
+    .patch('/updateCar/:id', isAuthenticatedUser,car.updateCar)
     .delete('/deleteCar/:id', isAuthenticatedUser, car.deleteCar)
+    .post('/singleUpload', isAuthenticatedUser,upload.single('image'), car.singleUpload)
+    .post('/multipleUpload', isAuthenticatedUser,upload.array('images', 6), car.multiUpload)
  
-exports.router = router  
+exports.router = router     

@@ -63,7 +63,7 @@ exports.sendEmail = async (email, otp) => {
     };
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
-            return new ResponseHandler(res, 500,false,"Failed to send email" )
+            return new ResponseHandler(500,false,"Failed to send email" )
             // return res.status(500).json({ message: "Failed to send email" });
         } else {
             return new ResponseHandler(res, 200,true,"Email sent successfully" )

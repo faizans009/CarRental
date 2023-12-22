@@ -4,11 +4,19 @@ const carSchema = new mongoose.Schema({
   companyName: {
     type: String,
   },
-  image: [
+  categoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
+  images: [
     {
       type: String,
     },
   ],
+  bannerImage: {
+    type: String,
+  },
   carName: {
     type: String,
   },
