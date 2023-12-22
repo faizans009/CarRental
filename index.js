@@ -28,6 +28,9 @@ const connection = mongoose.connection;
 connection.once("open", () => {
   console.log("Database Connection has been established successfully");
 });
+const swaggerUi=require('swagger-ui-express')
+const swaggerDocument = require('./swagger-output.json')
+app.use('/api-docs',swaggerUi.serve,swaggerUi.setup(swaggerDocument));
 
 app.use("/auth", userRouter.router);
 app.use("/car", carRouter.router);
@@ -37,7 +40,6 @@ app.use("/profile", profileRouter.router);
 app.use("/contact", contactUsRouter.router); 
 app.use("/fav", favouriteRouter.router);
 app.use("/order", orderRouter.router);
-
 app.get('/',(req,res)=>{
   res.send('test')
 })

@@ -25,7 +25,9 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.7",
     "otp-generator": "^4.0.1",
-    "path": "^0.12.7"
+    "path": "^0.12.7",
+    "swagger-autogen": "^2.23.7",
+    "swagger-ui-express": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
