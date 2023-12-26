@@ -1,19 +1,31 @@
-const profileService = require("../services/profileServices");
 const ResponseHandler = require("../utils/responseHandler");
-const fs = require("fs");
+const User = require("../models/user");
+const Profile = require("../models/profileModel");
 // create profile
 exports.createProfile = async (req, res) => {
   try {
     const userId = req.user.id;
-    const profileImage = req.files["profileImage"][0].path;
-    const frontImage = req.files["frontImage"][0].path;
-    const backImage = req.files["backImage"][0].path;
-    const newProfile = await profileService.createProfile({
-      userId,
-      data: req.body,
-      profileImage: profileImage,
-      frontImage: frontImage,
-      backImage: backImage,
+    const user = await User.findOne({ _id: userId });
+    if (!user) {
+      return new ResponseHandler(res, 404, false, "User not found");
+    }
+    const profile = await Profile.findOne({ user: userId });
+    if (profile) {
+      return new ResponseHandler(res, 404, false, "Profile not found");
+    }
+    const newProfile = await Profile.create({
+      user: userId,
+      profileImage: req.body.profileImage,
+      fullName: req.body.fullName,
+      mobile: req.body.mobile,
+      email: req.body.email,
+      gender: req.body.gender,
+      postcode: req.body.postcode,
+      address: req.body.address,
+      city: req.body.city,
+      licenseNo: req.body.licenseNo,
+      frontImage: req.body.frontImage,
+      backImage: req.body.backImage,
     });
     return new ResponseHandler(
       res,
@@ -30,7 +42,7 @@ exports.createProfile = async (req, res) => {
 
 exports.getProfile = async (req, res) => {
   try {
-    const profile = await profileService.getProfile();
+    const profile = await Profile.find();
     if (profile.length === 0) {
       return new ResponseHandler(res, 404, false, "No license profile found");
     }
@@ -39,23 +51,40 @@ exports.getProfile = async (req, res) => {
     return new ResponseHandler(res, 500, false, error.message);
   }
 };
+// get profile by id
+exports.getProfileById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const profile = await Profile.findById(id);
+    if (!profile) {
+      return new ResponseHandler(res, 404, false, "Profile not found");
+    }
+    return new ResponseHandler(res, 200, true, "Profile found", profile);
+  } catch (error) {
+    return new ResponseHandler(res, 500, false, error.message);
+  }
+};
+
 
 //   update data
 exports.updateProfile = async (req, res) => {
   const user = req.user.id;
   const updateData = req.body;
   try {
-    if (req.files) {
-      updateData.ProfileImage = req.files.path;
-      updateData.frontImage = req.files.path;
-      updateData.backImage = req.files.path;
+    const profile = await Profile.findOne({ user });
+    if (!profile) {
+      return new ResponseHandler(res, 404, false, "Profile not found");
     }
-    const updatedProfile = await profileService.updateProfile(
-      user,
-      updateData,
-      req.files
-    );
 
+    
+    const updatedProfile = await await Profile.findByIdAndUpdate(
+      profile._id,
+      updateData,
+      { new: true }
+    );
+    if (!updatedProfile) {
+      return new ResponseHandler(res, 404, false, "license Profile not found");
+    }
     return new ResponseHandler(
       res,
       200,
@@ -69,11 +98,16 @@ exports.updateProfile = async (req, res) => {
   }
 };
 
-// delete data
+
+// delete profile by id
 exports.deleteProfile = async (req, res) => {
   const { id } = req.params;
   try {
-    await profileService.deleteProfile(id);
+    const profile = await Profile.findOne({ user: id });
+    if (!profile) {
+      return new ResponseHandler(res, 404, false, "Profile not found");
+    }
+    await Profile.deleteOne({ _id: profile._id });
     return new ResponseHandler(
       res,
       200,

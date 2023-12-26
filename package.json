@@ -26,8 +26,9 @@
     "nodemailer": "^6.9.7",
     "otp-generator": "^4.0.1",
     "path": "^0.12.7",
-    "swagger-autogen": "^2.23.7",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-autogen": "^2.23.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express":"^4.6.3"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

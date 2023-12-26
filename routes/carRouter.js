@@ -7,6 +7,7 @@ router
     .post('/createCar', isAuthenticatedUser, car.createCar)
     .get('/getAllCars', car.getAllCars)
     .get('/getOneCar/:id', car.getOneCar)
+    .get('/getCarsByCategory', car.getCarsByCategory)
     .patch('/updateCar/:id', isAuthenticatedUser,car.updateCar)
     .delete('/deleteCar/:id', isAuthenticatedUser, car.deleteCar)
     .post('/singleUpload', isAuthenticatedUser,upload.single('image'), car.singleUpload)

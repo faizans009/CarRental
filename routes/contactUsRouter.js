@@ -4,6 +4,8 @@ const contactUs = require('../controllers/contactUsController')
 const { isAuthenticatedUser } = require('../middlewares/auth');
 
 router
-    .post('/createContact', contactUs.createContactUs)
+    .post('/createContact',isAuthenticatedUser, contactUs.createContactUs)
+    .get('/getContact',isAuthenticatedUser, contactUs.getContactUs)
+    .delete('/deleteContact/:id',isAuthenticatedUser, contactUs.deleteContactUs)
 
 exports.router = router;

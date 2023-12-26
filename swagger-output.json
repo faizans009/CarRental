@@ -1,26 +1,15 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "The Pet Store Backend",
-    "description": "This is The Pet Store",
+    "title": "spoonApplication",
+    "description": "Description",
     "version": "1.0.0"
   },
-  "host": "https://car-rental-six-sooty.vercel.app/",
-  "basePath": "/",
+  "host": "localhost:5000",
+  "basePath": "",
   "schemes": [
     "http",
     "https"
   ],
-  "paths": {
-    "/": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    }
-  }
+  "paths": {}
 }

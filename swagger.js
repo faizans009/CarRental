@@ -1,14 +1,18 @@
-const swaggerAutogen = require('swagger-autogen');
+const swaggerAutogen = require("swagger-autogen")();
+
 const doc = {
     info: {
-        title:"The Pet Store Backend",
-        description:"This is The Pet Store"
+        title: "spoonApplication",
+        description: "Description",
     },
-    host:"https://car-rental-six-sooty.vercel.app/",
-    schemes:['http','https']
-}
-const outputFile = './swagger-output.json'
-const endPonintFiles = ['./index.js']
-swaggerAutogen(outputFile,endPonintFiles,doc).then(()=>{
-    require('./index.js')
-})
+    host: "localhost:5000",
+    basePath: "",
+    schemes: ["http", "https"],
+};
+
+const outputFile = "./swagger-output.json";
+const endpointsFiles = [
+    "./index.js"
+];
+
+swaggerAutogen(outputFile, endpointsFiles, doc);

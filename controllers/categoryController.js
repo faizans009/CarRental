@@ -1,7 +1,4 @@
 const Category = require("../models/categoryModel");
-const Car = require("../models/carModel");
-const categoryService = require('../services/categoryService');
-const fs = require("fs");
 const ResponseHandler = require("../utils/responseHandler")
 
 // create category
@@ -44,27 +41,13 @@ exports.getCategory = async(req,res) => {
     if (category.length === 0) {
       return new ResponseHandler(res, 404,false,"No categories found" )
     }
-      return new ResponseHandler(res, 200,true,"Car created successfully",category )
+      return new ResponseHandler(res, 200,true,"Category created successfully",category )
       
   } 
   catch(error){
     return new ResponseHandler(res, 500,false,error.message )
   } 
 }
-
-exports.getCarByCategory = async(req,res) => { 
-  try{
-     const {companyName} = req.body; 
-     const cars = await Car.find({companyName});
-     if (cars.length === 0) {
-      return new ResponseHandler(res, 404,false,"No car found with that company" )
-    }
-     return new ResponseHandler(res, 200,true,"get Cars with company name",cars )
-  }
-  catch(error){
-    return new ResponseHandler(res, 200,true,error.message )
-  }
-} 
  
 // get one category
 exports.getOneCategory = async(req,res) =>{
@@ -83,26 +66,17 @@ exports.getOneCategory = async(req,res) =>{
 // update category
 exports.updateCategory = async (req, res) => {
   
-  if (req.user._id && req.user.admin) {
+  if (
+    (req.user._id && req.user.role === "admin") ||
+    req.user.role === "superAdmin"
+  ) {
   try {
     const { id } = req.params;
-  const updateData = req.body;
-
-  // Check if a new image file is uploaded and update the image path in updateData
-  if (req.file) {
-      updateData.categoryImage = req.file.path;
-  }
-      // Find the category by its ID
+  // const updateData = req.body;
       const category = await Category.findById(id);
 
       if (!category) {
         return new ResponseHandler(res, 404,false,"Category not found" )
-      }
-
-      // Check if an old image exists and if a new image is uploaded
-      if (req.file && category.categoryImage) {
-          // Delete the old image
-          fs.unlinkSync(category.categoryImage); 
       }
 
       const updatedCategory = await Category.findByIdAndUpdate(id, req.body, { new: true });
@@ -116,16 +90,24 @@ exports.updateCategory = async (req, res) => {
     return new ResponseHandler(res, 500,false,error.message )
   }
 } else {
-  return new ResponseHandler(res, 403,true,"Unauthorized. Only admin can update  category" )
-} 
+  return new ResponseHandler(
+    res,
+    403,
+    false,
+    "Unauthorized. Only admin can get users"
+  );
+}
 };
 
 // delete category
 exports.deleteCategory = async(req,res) => {
-  if (req.user._id && req.user.admin) {
+  if (
+    (req.user._id && req.user.role === "admin") ||
+    req.user.role === "superAdmin"
+  ) {
   try{
     const {id} = req.params
-      await categoryService.deleteCategory(id);
+      await Category.findByIdAndRemove(id)
       return new ResponseHandler(res, 200,true,"Category deleted successfully" )
   }
   catch(error){

@@ -6,68 +6,38 @@ const User = require("../models/user");
 const mongoose = require("mongoose");
 exports.createOrder = async (req, res) => {
   try {
-    const {
-      carId,
-      Name,
-      PhoneNo,
-      Address,
-      Town,
-      pickupLocation,
-      pickupDate,
-      pickupTime,
-      dropOffLocation,
-      dropOffDate,
-      dropOffTime,
-      cardNo,
-      ExpDate,
-      cardHolder,
-      cvc,
-    } = req.body;
-    const userId=req.user.id
-    console.log(userId);
-    
+    const userId = req.user.id;
     const user = await User.findOne({ _id: userId });
-    const car = await Car.findOne({ _id: carId });
-
+    const car = await Car.findOne({ _id: req.body.carId });
     if (!user) {
-      return new ResponseHandler(
-        res,
-        404,
-        false,
-        "user not found"
-      );
+      return new ResponseHandler(res, 404, false, "user not found");
     }
     if (!car) {
-      return new ResponseHandler(
-        res,
-        404,
-        false,
-        "Car not found"
-      );
+      return new ResponseHandler(res, 404, false, "Car not found");
     }
 
     const existingOrder = await Order.aggregate([
       {
         $match: {
-          car: new mongoose.Types.ObjectId(carId),
+          car: new mongoose.Types.ObjectId(req.body.carId),
           status: "booked",
           $or: [
             {
               $and: [
-                { "Pickup.date": { $lte: pickupDate } },
-                { "DropOff.date": { $gte: pickupDate } },
+                { "Pickup.date": { $lte: req.body.pickupDate } },
+                { "DropOff.date": { $gte: req.body.pickupDate } },
               ],
             },
             {
               $and: [
-                { "Pickup.date": { $lte: dropOffDate } },
-                { "DropOff.date": { $gte: pickupDate } },
+                { "Pickup.date": { $lte: req.body.dropOffDate } },
+                { "DropOff.date": { $gte: req.body.pickupDate } },
               ],
             },
             {
               $and: [
-                { "Pickup.date": { $lte: dropOffDate } },
-                { "DropOff.date": { $gte: pickupDate } },
+                { "Pickup.date": { $lte: req.body.dropOffDate } },
+                { "DropOff.date": { $gte: req.body.pickupDate } },
               ],
             },
           ],
@@ -83,8 +53,12 @@ exports.createOrder = async (req, res) => {
       );
     }
 
-    const pickupDateTime = new Date(`${pickupDate} ${pickupTime}`);
-    const dropOffDateTime = new Date(`${dropOffDate} ${dropOffTime}`);
+    const pickupDateTime = new Date(
+      `${req.body.pickupDate} ${req.body.pickupTime}`
+    );
+    const dropOffDateTime = new Date(
+      `${req.body.dropOffDate} ${req.body.dropOffTime}`
+    );
     const timeDifference = Math.abs(
       dropOffDateTime.getTime() - pickupDateTime.getTime()
     );
@@ -93,32 +67,33 @@ exports.createOrder = async (req, res) => {
 
     const newOrderInfo = await Order.create({
       user: userId,
-      car: carId,
-      Name: Name,
-      PhoneNo: PhoneNo,
-      Address: Address,
-      Town: Town,
+      car: req.body.carId,
+      Name: req.body.Name,
+      PhoneNo: req.body.PhoneNo,
+      Address: req.body.Address,
+      Town: req.body.Town,
       Pickup: {
-        location: pickupLocation,
-        date: pickupDate,
-        time: pickupTime,
+        location: req.body.pickupLocation,
+        date: req.body.pickupDate,
+        time: req.body.pickupTime,
       },
       DropOff: {
-        location: dropOffLocation,
-        date: dropOffDate,
-        time: dropOffTime,
+        location: req.body.dropOffLocation,
+        date: req.body.dropOffDate,
+        time: req.body.dropOffTime,
       },
-      cardNo: cardNo,
-      ExpDate: ExpDate,
-      cardHolder: cardHolder,
-      cvc: cvc,
+      cardNo: req.body.cardNo,
+      ExpDate: req.body.ExpDate,
+      cardHolder: req.body.cardHolder,
+      cvc: req.body.cvc,
       price: car.price,
       totalDays: totalDays,
       totalPrice: totalPrice,
     });
-
-    // Update the car status to 'booked'
-    await Order.updateOne({ _id: newOrderInfo }, { $set: { status: "booked" } });
+    await Order.updateOne(
+      { _id: newOrderInfo },
+      { $set: { status: "booked" } }
+    );
 
     return new ResponseHandler(
       res,
@@ -134,37 +109,27 @@ exports.createOrder = async (req, res) => {
 };
 
 exports.getOrder = async (req, res) => {
-  try {
-    const isAdmin = req.user._id && req.user.admin;
-    if (!isAdmin) {
+  if (
+    (req.user._id && req.user.role === "admin") ||
+    req.user.role === "superAdmin"
+  ) {
+    try {
+      const { page, limit } = req.query;
+      const skipCount = (page - 1) * limit;
+      const newOrderInfo = await Order.find()
+        .skip(skipCount)
+        .limit(limit);
+      if (newOrderInfo.length === 0) {
+        return new ResponseHandler(res, 404, false, "No Order info found");
+      }
+
       return new ResponseHandler(
         res,
-        403,
-        false,
-        "Unauthorized: Only admin can access Order information"
+        200,
+        true,
+        "Get order successfully",
+        newOrderInfo
       );
-    }
-    const newOrderInfo = await orderService.getOrder();
-
-    return new ResponseHandler(
-      res,
-      200,
-      true,
-      "Get order successfully",
-      newOrderInfo
-    );
-  } catch (error) {
-    return new ResponseHandler(res, 500, false, error.message);
-  }
-};
-
-exports.updateStatus = async (req, res) => {
-  if (req.user._id && req.user.admin) {
-    try {
-      const { carId, status } = req.body;
-      const newOrder = await orderService.updateStatus(carId, { status });
-
-      return new ResponseHandler(res, 200, true, "status Updated", newOrder);
     } catch (error) {
       return new ResponseHandler(res, 500, false, error.message);
     }
@@ -177,3 +142,48 @@ exports.updateStatus = async (req, res) => {
     );
   }
 };
+// update order status
+exports.updateStatus = async (req, res) => {
+  if (
+    (req.user._id && req.user.role === "admin") ||
+    req.user.role === "superAdmin"
+  ) {
+    try {
+      const { orderId, status } = req.body;
+      const newOrder = await Order.updateOne(
+        { _id: orderId },
+        { $set: { status: status } }
+      );
+      return new ResponseHandler(res, 200, true, "status Updated");
+    } catch (error) {
+      return new ResponseHandler(res, 500, false, error.message);
+    }
+  } else {
+    return new ResponseHandler(
+      res,
+      403,
+      false,
+      "Unauthorized. Only admin users can create cars."
+    );
+  }
+};
+
+// exports.updateStatus = async (req, res) => {
+//   if (req.user._id && req.user.admin) {
+//     try {
+//       const { carId, status } = req.body;
+//       const newOrder = await Order.updateStatus(carId, { status });
+
+//       return new ResponseHandler(res, 200, true, "status Updated", newOrder);
+//     } catch (error) {
+//       return new ResponseHandler(res, 500, false, error.message);
+//     }
+//   } else {
+//     return new ResponseHandler(
+//       res,
+//       403,
+//       false,
+//       "Unauthorized. Only admin users can create cars."
+//     );
+//   }
+// };

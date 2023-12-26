@@ -3,76 +3,24 @@ const Category = require("../models/categoryModel");
 const ResponseHandler = require("../utils/responseHandler");
 const fs = require("fs");
 // create cars
-// exports.createCar = async (req, res) => {
-//   if (
-//     (req.user._id && req.user.role === "admin") ||
-//     req.user.role === "superAdmin"
-//   ) {
-//     try {
-//       const category = await Category.findOne(req.body.categoryId);
-
-//       if (!category) {
-//         return new ResponseHandler(res, 404, false, " car category not found");
-//       }
-//       const newCar = await Car.create({
-//         categoryId: req.body.categoryId,
-//         companyName: req.body.companyName,
-//         image: req.body.images,
-//         bannerImage: req.body.bannerImage,
-//         carName: req.body.carName,
-//         carType: req.body.carType,
-//         fuelCapacity: req.body.fuelCapacity,
-//         steering: req.body.steering,
-//         capacity: req.body.capacity,
-//         make: req.body.make,
-//         model: req.body.model,
-//         registrationCity: req.body.registrationCity,
-//         transmission: req.body.transmission,
-//         favourite: req.body.favourite,
-//         rating: req.body.rating,
-//         reviews: req.body.reviews,
-//         condition: req.body.condition,
-//         fuelType: req.body.fuelType,
-//         carDesc: req.body.carDesc,
-//         price: req.body.price,
-//       });
-//       return new ResponseHandler(
-//         res,
-//         200,
-//         true,
-//         "Car created successfully",
-//         newCar
-//       );
-//     } catch (error) {
-//       return new ResponseHandler(res, 500, false, error.message);
-//     }
-//   } else {
-//     return new ResponseHandler(
-//       res,
-//       403,
-//       false,
-//       "Unauthorized. Only admin users can create cars."
-//     );
-//   }
-// };
 exports.createCar = async (req, res) => {
   try {
-    // Check if the user is authorized to create cars
     if (!(req.user.role === "admin" || req.user.role === "superAdmin")) {
-      return new ResponseHandler(res, 403, false, "Unauthorized. Only admin or super admin can create cars.");
+      return new ResponseHandler(
+        res,
+        403,
+        false,
+        "Unauthorized. Only admin or super admin can create cars."
+      );
     }
-
-    // Check if the category exists
     const category = await Category.findById(req.body.categoryId);
     if (!category) {
       return new ResponseHandler(res, 404, false, "Car category not found");
     }
-
-    // Create a new car
     const newCar = await Car.create({
       categoryId: req.body.categoryId,
       companyName: req.body.companyName,
-      images: req.body.images, // Assuming images is an array of image paths
+      images: req.body.images,
       bannerImage: req.body.bannerImage,
       carName: req.body.carName,
       carType: req.body.carType,
@@ -93,7 +41,13 @@ exports.createCar = async (req, res) => {
     });
 
     // Return success response with the new car object
-    return new ResponseHandler(res, 201, true, "Car created successfully", newCar);
+    return new ResponseHandler(
+      res,
+      201,
+      true,
+      "Car created successfully",
+      newCar
+    );
   } catch (error) {
     // Handle errors
     console.error(error.message);
@@ -103,7 +57,11 @@ exports.createCar = async (req, res) => {
 // // get all cars
 exports.getAllCars = async (req, res) => {
   try {
-    const cars = await Car.find();
+    const { page, limit } = req.query;
+    const skipCount = (page - 1) * limit;
+    const cars = await Car.find()
+      .skip(skipCount)
+      .limit(limit);
     if (cars.length === 0) {
       return new ResponseHandler(res, 404, false, "No cars found");
     }
@@ -129,8 +87,40 @@ exports.getOneCar = async (req, res) => {
   }
 };
 
-// update car
+// get cars by category
+exports.getCarsByCategory = async (req, res) => {
+  const { categoryId, page, limit } = req.query;
 
+  try {
+    const skipCount = (page - 1) * limit;
+    const cars = await Car.find({ categoryId })
+      .skip(skipCount)
+      .limit(limit)
+      .populate("categoryId");
+
+    if (cars.length === 0) {
+      return new ResponseHandler(
+        res,
+        404,
+        false,
+        "No cars found for the given category"
+      );
+    }
+
+    return new ResponseHandler(
+      res,
+      200,
+      true,
+      "Cars found for the given category",
+      cars
+    );
+  } catch (error) {
+    console.error(error.message);
+    return new ResponseHandler(res, 500, false, "Internal server error");
+  }
+};
+
+// update car
 exports.updateCar = async (req, res) => {
   if (
     (req.user._id && req.user.role === "admin") ||
@@ -139,24 +129,15 @@ exports.updateCar = async (req, res) => {
     try {
       const { id } = req.params;
       const updateData = req.body;
+      const car = await Car.findById(id);
 
-      // if (req.files) {
-      //   updateData.image =  req.files.map((file) => file.path);
-      // }
-
-      const updatedCar = await Car.findByIdAndUpdate(id, updateData, {
-        new: true,
-      });
-      if (!updatedCar) {
+      if (!car) {
         return new ResponseHandler(res, 404, false, "Car not found");
       }
-      if (updateData.image && updatedCar.image) {
-        updatedCar.image.forEach((file) => {
-          fs.unlinkSync(file);
-        });
-      }
 
-      return new ResponseHandler(res, 200, true, "Car Updated", updatedCar);
+      await Car.findByIdAndUpdate(id, updateData, { new: true });
+
+      return new ResponseHandler(res, 200, true, "Car updated successfully");
     } catch (error) {
       return new ResponseHandler(res, 500, false, error.message);
     }

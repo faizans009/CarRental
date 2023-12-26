@@ -80,35 +80,35 @@ const User = require("../models/user");
 // }
 
 // get order
-async function getOrder(){
-  try{
-    const newOrderInfo = await Order.find();
-    if (newOrderInfo.length === 0){
-      throw new Error("No Order info found")
-    }
-    return newOrderInfo
-  }
-  catch(error){
-    throw new Error(error.message);
-  }
-}
-// update status
-async function updateStatus(carId, {status}){
-  try{
-    const car = await Car.findByIdAndUpdate(carId, {status}) 
-    if (!car) {
-      throw new Error("car not found");
-    }
-    return car;
-  }
-  catch(error){
-    throw new Error(error.message)
-  }
-}
-module.exports= {
-  // createOrder,
-  getOrder,
-  updateStatus
+// async function getOrder(){
+//   try{
+//     const newOrderInfo = await Order.find();
+//     if (newOrderInfo.length === 0){
+//       throw new Error("No Order info found")
+//     }
+//     return newOrderInfo
+//   }
+//   catch(error){
+//     throw new Error(error.message);
+//   }
+// }
+// // update status
+// async function updateStatus(carId, {status}){
+//   try{
+//     const car = await Car.findByIdAndUpdate(carId, {status}) 
+//     if (!car) {
+//       throw new Error("car not found");
+//     }
+//     return car;
+//   }
+//   catch(error){
+//     throw new Error(error.message)
+//   }
+// }
+// module.exports= {
+//   // createOrder,
+//   getOrder,
+//   updateStatus
     
-}
+// }
     
