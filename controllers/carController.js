@@ -54,7 +54,7 @@ exports.createCar = async (req, res) => {
     return new ResponseHandler(res, 500, false, "Internal server error");
   }
 };
-// // get all cars
+// get all cars
 exports.getAllCars = async (req, res) => {
   try {
     const { page, limit } = req.query;
@@ -119,6 +119,25 @@ exports.getCarsByCategory = async (req, res) => {
     return new ResponseHandler(res, 500, false, "Internal server error");
   }
 };
+// get popular cars by rating from top to bottom
+exports.getPopularCars = async (req, res) => {
+  try {
+    const cars = await Car.find()
+      .sort({ rating: -1 })
+      .limit(10)
+      .populate("categoryId");
+
+
+    if (cars.length === 0) {
+      return new ResponseHandler(res, 404, false, "No cars found");
+    }
+
+    return new ResponseHandler(res, 200, true, "Cars found", cars);
+  } catch (error) {
+    
+    return new ResponseHandler(res, 500, false, error.message);
+  }
+  }
 
 // update car
 exports.updateCar = async (req, res) => {

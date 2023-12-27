@@ -1,6 +1,5 @@
 const ResponseHandler = require("../utils/responseHandler")
 const ContactUs = require("../models/contactUsModel");
-// const User = require("../models/user");
 exports.createContactUs = async (req, res) => {
     const userId=req.user.id
     try {
@@ -16,7 +15,6 @@ exports.createContactUs = async (req, res) => {
         return new ResponseHandler(res, 200, true, "ContactUs created successfully", newContact);
     } catch (error) {
         console.log(error.message);
-        
         return new ResponseHandler(res, 500, false, error.message);
     }
 };
