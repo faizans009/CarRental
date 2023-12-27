@@ -122,10 +122,11 @@ exports.getCarsByCategory = async (req, res) => {
 // get popular cars by rating from top to bottom
 exports.getPopularCars = async (req, res) => {
   try {
+    const {page, limit } = req.query;
+    const skipCount = (page - 1) * limit;
     const cars = await Car.find()
-      .sort({ rating: -1 })
-      .limit(10)
-      .populate("categoryId");
+      .skip(skipCount)
+      .limit(limit)
 
 
     if (cars.length === 0) {
