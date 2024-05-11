@@ -1,0 +1,15 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "spoonApplication",
+    "description": "Description",
+    "version": "1.0.0"
+  },
+  "host": "localhost:5000",
+  "basePath": "",
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {}
+}
