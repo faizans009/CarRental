@@ -14,4 +14,4 @@ router
     .post('/singleUpload', isAuthenticatedUser,upload.single('image'), car.singleUpload)
     .post('/multipleUpload', isAuthenticatedUser,upload.array('images', 6), car.multiUpload)
  
-exports.router = router     
+exports.router = router        
