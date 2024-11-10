@@ -13,6 +13,7 @@
   "dependencies": {
     "@vercel/blob": "^0.15.1",
     "bcrypt": "^5.1.1",
+    "cloudinary": "^2.5.1",
     "connect-mongodb-session": "^3.1.1",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -26,9 +27,8 @@
     "nodemailer": "^6.9.7",
     "otp-generator": "^4.0.1",
     "path": "^0.12.7",
-    "swagger-autogen": "^2.23.1",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express":"^4.6.3"
+    "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"

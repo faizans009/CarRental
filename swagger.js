@@ -1,18 +1,22 @@
-const swaggerAutogen = require("swagger-autogen")();
+const swaggerJSDoc = require("swagger-jsdoc");
 
-const doc = {
-    info: {
-        title: "spoonApplication",
-        description: "Description",
+const swaggerDefinition = {
+  openapi: "3.0.0",
+  info: {
+    title: "Car ",
+    version: "1.0.0",
+    description: "Car  API documentation :)",
+    contact: {
+      name: "Danish Javed",
     },
-    host: "localhost:5000",
-    basePath: "",
-    schemes: ["http", "https"],
+    servers: [{ url: "http://localhost:5000" }],
+  },
 };
 
-const outputFile = "./swagger-output.json";
-const endpointsFiles = [
-    "./index.js"
-];
+const options = {
+  swaggerDefinition,
+  apis: ["./routes/*.js"],
+};
 
-swaggerAutogen(outputFile, endpointsFiles, doc);
+const swaggerSpec = swaggerJSDoc(options);
+module.exports =  swaggerSpec ;
